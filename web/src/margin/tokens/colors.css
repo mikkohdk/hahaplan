@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Margin — Color tokens
+   Warm "ink-on-paper" neutrals + a single teal-leaning cerulean accent.
+   Base values first, then semantic aliases. Dark theme overrides the
+   base ramps only, so component CSS never branches on theme.
+   ========================================================================== */
+
+:root {
+  /* ---- Paper (warm-tinted surfaces, light) ---------------------------- */
+  --paper-0: #FAF9F6;   /* app background        */
+  --paper-1: #FFFFFF;   /* raised surface / card */
+  --paper-2: #F3F1EC;   /* sunken / subtle fill  */
+  --paper-3: #ECE9E2;   /* hover fill            */
+  --paper-4: #E3DFD6;   /* pressed / active fill */
+
+  /* ---- Ink (warm near-black greys, text) ------------------------------ */
+  --ink-0: #1A1916;     /* strongest text / headings */
+  --ink-1: #2E2C28;     /* body text                 */
+  --ink-2: #6B6760;     /* secondary text            */
+  --ink-3: #9A968D;     /* muted / placeholder       */
+  --ink-4: #BFBBB2;     /* disabled                  */
+
+  /* ---- Lines & borders ------------------------------------------------ */
+  --line-1: #ECE8DF;    /* hairline / subtle divider */
+  --line-2: #DCD7CC;    /* default border            */
+  --line-3: #C7C1B4;    /* strong border             */
+
+  /* ---- Accent — Cerulean (teal-leaning blue) -------------------------- */
+  --cobalt-0: #E6F1F6;  /* tint fill        */
+  --cobalt-1: #CBE3EE;  /* tint hover       */
+  --cobalt-2: #176C97;  /* base / primary   */
+  --cobalt-3: #135B80;  /* hover            */
+  --cobalt-4: #0F4A68;  /* pressed          */
+  --cobalt-5: #0E435E;  /* on-tint text     */
+
+  /* ---- Semantic hues -------------------------------------------------- */
+  --green-tint: #E6F4EC;  --green:  #1F8A4C;  --green-strong:  #166A3A;
+  --amber-tint: #FBEFD3;  --amber:  #B5730E;  --amber-strong:  #8A5806;
+  --red-tint:   #FBE9E6;  --red:    #C4362B;  --red-strong:    #9F2A21;
+
+  /* ====================================================================
+     SEMANTIC ALIASES — reference these in components, not the raw values.
+     ==================================================================== */
+
+  /* Surfaces */
+  --surface-app:      var(--paper-0);
+  --surface-card:     var(--paper-1);
+  --surface-sunken:   var(--paper-2);
+  --surface-hover:    var(--paper-3);
+  --surface-active:   var(--paper-4);
+  --surface-inverse:  var(--ink-0);
+
+  /* Text */
+  --text-strong:   var(--ink-0);
+  --text-body:     var(--ink-1);
+  --text-muted:    var(--ink-2);
+  --text-subtle:   var(--ink-3);
+  --text-disabled: var(--ink-4);
+  --text-on-accent:  #FFFFFF;
+  --text-on-inverse: var(--paper-0);
+  --text-link:     var(--cobalt-2);
+
+  /* Borders */
+  --border-subtle:  var(--line-1);
+  --border-default: var(--line-2);
+  --border-strong:  var(--line-3);
+  --border-focus:   var(--cobalt-2);
+
+  /* Accent roles */
+  --accent:            var(--cobalt-2);
+  --accent-hover:      var(--cobalt-3);
+  --accent-press:      var(--cobalt-4);
+  --accent-tint:       var(--cobalt-0);
+  --accent-tint-hover: var(--cobalt-1);
+  --accent-on-tint:    var(--cobalt-5);
+
+  /* Status — surface / foreground pairs */
+  --success: var(--green);  --success-surface: var(--green-tint);  --success-text: var(--green-strong);
+  --warning: var(--amber);  --warning-surface: var(--amber-tint);  --warning-text: var(--amber-strong);
+  --danger:  var(--red);    --danger-surface:  var(--red-tint);    --danger-text:  var(--red-strong);
+
+  /* Focus ring color (used in --shadow-focus) */
+  --focus-ring: rgba(23, 108, 151, 0.32);
+
+  /* Selection */
+  --selection-bg: var(--cobalt-1);
+  --selection-fg: var(--ink-0);
+}
+
+/* ======================================================================
+   DARK THEME — set data-theme="dark" on <html> or any container.
+   Overrides the base ramps; semantic alias names stay identical.
+   ====================================================================== */
+[data-theme="dark"] {
+  --paper-0: #16150F;
+  --paper-1: #1E1D16;
+  --paper-2: #262419;
+  --paper-3: #312F22;
+  --paper-4: #3B392A;
+
+  --ink-0: #F7F4EC;
+  --ink-1: #E7E3D7;
+  --ink-2: #ABA697;
+  --ink-3: #807B6D;
+  --ink-4: #5A564B;
+
+  --line-1: #2C2A1F;
+  --line-2: #3A3729;
+  --line-3: #4D4A38;
+
+  --cobalt-0: #102733;
+  --cobalt-1: #163A4B;
+  --cobalt-2: #4FA6CC;
+  --cobalt-3: #6FB8D8;
+  --cobalt-4: #92CBE4;
+  --cobalt-5: #C2E2EF;
+
+  --green-tint: #13301F; --green: #4FB87C; --green-strong: #8BD6A8;
+  --amber-tint: #322611; --amber: #E0A640; --amber-strong: #F1C97E;
+  --red-tint:   #381C19; --red:   #E8675B; --red-strong:   #F4A097;
+
+  --text-on-accent:  #0E1730;
+  --surface-inverse: var(--paper-1);
+  --text-on-inverse: var(--ink-0);
+
+  --focus-ring: rgba(79, 166, 204, 0.40);
+  --selection-bg: #163A4B;
+  --selection-fg: #F7F4EC;
+}

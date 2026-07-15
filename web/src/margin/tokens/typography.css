@@ -1,0 +1,84 @@
+/* ==========================================================================
+   Margin — Typography tokens
+   Editorial serif display + neutral grotesque UI + mono metadata.
+   ========================================================================== */
+
+:root {
+  /* ---- Families ------------------------------------------------------- */
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans:    'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---- Size ramp (px) ------------------------------------------------- */
+  --fs-2xs: 11px;
+  --fs-xs:  12px;
+  --fs-sm:  13px;
+  --fs-base:15px;
+  --fs-md:  16px;
+  --fs-lg:  18px;
+  --fs-xl:  20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 30px;
+  --fs-4xl: 38px;
+  --fs-5xl: 48px;
+  --fs-6xl: 64px;
+  --fs-7xl: 80px;
+
+  /* ---- Line height ---------------------------------------------------- */
+  --lh-none:    1;     /* @kind font */
+  --lh-tight:   1.1;   /* @kind font */
+  --lh-snug:    1.25;  /* @kind font */
+  --lh-normal:  1.5;   /* @kind font */
+  --lh-relaxed: 1.65;  /* @kind font */
+
+  /* ---- Weight --------------------------------------------------------- */
+  --fw-regular:  400;  /* @kind font */
+  --fw-medium:   500;  /* @kind font */
+  --fw-semibold: 600;  /* @kind font */
+  --fw-bold:     700;  /* @kind font */
+
+  /* ---- Letter-spacing ------------------------------------------------- */
+  --tracking-tighter: -0.03em;
+  --tracking-tight:   -0.015em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.02em;
+  --tracking-caps:    0.08em;   /* mono eyebrow / overline */
+
+  /* ====================================================================
+     SEMANTIC TYPE ROLES
+     Each role names a family + size + line-height + weight + tracking.
+     ==================================================================== */
+
+  /* Display — Newsreader serif, for hero & section headers */
+  --display-1-font:  var(--font-display); --display-1-size: var(--fs-7xl); --display-1-lh: var(--lh-none);  --display-1-weight: var(--fw-semibold); --display-1-tracking: var(--tracking-tighter);
+  --display-2-font:  var(--font-display); --display-2-size: var(--fs-6xl); --display-2-lh: var(--lh-tight); --display-2-weight: var(--fw-semibold); --display-2-tracking: var(--tracking-tighter);
+  --display-3-font:  var(--font-display); --display-3-size: var(--fs-5xl); --display-3-lh: var(--lh-tight); --display-3-weight: var(--fw-semibold); --display-3-tracking: var(--tracking-tight);
+
+  /* Headings — Newsreader serif */
+  --h1-font: var(--font-display); --h1-size: var(--fs-4xl); --h1-lh: var(--lh-tight); --h1-weight: var(--fw-semibold); --h1-tracking: var(--tracking-tight);
+  --h2-font: var(--font-display); --h2-size: var(--fs-3xl); --h2-lh: var(--lh-snug); --h2-weight: var(--fw-semibold); --h2-tracking: var(--tracking-tight);
+  --h3-font: var(--font-display); --h3-size: var(--fs-2xl); --h3-lh: var(--lh-snug); --h3-weight: var(--fw-medium);   --h3-tracking: var(--tracking-normal);
+
+  /* Titles — grotesque sans, for UI section/card titles */
+  --title-1-font: var(--font-sans); --title-1-size: var(--fs-xl);  --title-1-lh: var(--lh-snug); --title-1-weight: var(--fw-semibold); --title-1-tracking: var(--tracking-tight);
+  --title-2-font: var(--font-sans); --title-2-size: var(--fs-lg);  --title-2-lh: var(--lh-snug); --title-2-weight: var(--fw-semibold); --title-2-tracking: var(--tracking-normal);
+  --title-3-font: var(--font-sans); --title-3-size: var(--fs-md);  --title-3-lh: var(--lh-snug); --title-3-weight: var(--fw-semibold); --title-3-tracking: var(--tracking-normal);
+
+  /* Body — grotesque sans */
+  --body-lg-font:  var(--font-sans); --body-lg-size:  var(--fs-lg);   --body-lg-lh:  var(--lh-relaxed); --body-lg-weight:  var(--fw-regular);
+  --body-font:     var(--font-sans); --body-size:     var(--fs-md);   --body-lh:     var(--lh-normal);  --body-weight:     var(--fw-regular);
+  --body-sm-font:  var(--font-sans); --body-sm-size:  var(--fs-base); --body-sm-lh:  var(--lh-normal);  --body-sm-weight:  var(--fw-regular);
+
+  /* Prose — Newsreader serif, for long-form reading */
+  --prose-font: var(--font-display); --prose-size: var(--fs-xl); --prose-lh: var(--lh-relaxed); --prose-weight: var(--fw-regular);
+
+  /* Labels & captions — grotesque sans */
+  --label-font:   var(--font-sans); --label-size:   var(--fs-sm); --label-lh: var(--lh-snug); --label-weight: var(--fw-medium);
+  --caption-font: var(--font-sans); --caption-size: var(--fs-xs); --caption-lh: var(--lh-normal); --caption-weight: var(--fw-regular);
+
+  /* Overline / eyebrow — mono, uppercase, tracked */
+  --overline-font: var(--font-mono); --overline-size: var(--fs-xs); --overline-lh: var(--lh-snug); --overline-weight: var(--fw-medium); --overline-tracking: var(--tracking-caps);
+
+  /* Code / metadata — mono */
+  --code-font: var(--font-mono); --code-size: var(--fs-sm); --code-lh: var(--lh-normal); --code-weight: var(--fw-regular);
+}

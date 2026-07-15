@@ -1,0 +1,11 @@
+/* ==========================================================================
+   Margin — Webfonts
+   Loaded from Google Fonts. If you need offline/embedded binaries, ask the
+   design-system maintainer to swap these @import lines for local @font-face.
+   --------------------------------------------------------------------------
+   Display / editorial : Newsreader      (serif, optical sizing 6..72)
+   UI / body           : Hanken Grotesk  (neutral grotesque)
+   Mono / metadata     : JetBrains Mono  (code, timestamps, labels)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');

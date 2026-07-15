@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Margin — Base layer
+   Light-touch resets + element defaults + type utility classes.
+   Consumers get this for free via styles.css. Components rely only on the
+   tokens, not these utilities, so this stays optional/cosmetic.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--surface-app);
+  color: var(--text-body);
+  font-family: var(--font-sans);
+  font-size: var(--body-size);
+  line-height: var(--body-lh);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--selection-bg); color: var(--selection-fg); }
+
+:where(a) { color: var(--text-link); text-underline-offset: 2px; }
+
+:where(h1, h2, h3, h4) { color: var(--text-strong); margin: 0; }
+
+:where(p) { margin: 0; text-wrap: pretty; }
+
+:where(code, kbd, samp) { font-family: var(--font-mono); font-size: 0.92em; }
+
+:where(hr) { border: 0; border-top: 1px solid var(--border-subtle); margin: var(--space-6) 0; }
+
+:where(:focus-visible) { outline: none; box-shadow: var(--shadow-focus); border-radius: var(--radius-xs); }
+
+/* ---- Type utility classes -------------------------------------------- */
+.text-display-1 { font-family: var(--display-1-font); font-size: var(--display-1-size); line-height: var(--display-1-lh); font-weight: var(--display-1-weight); letter-spacing: var(--display-1-tracking); color: var(--text-strong); }
+.text-display-2 { font-family: var(--display-2-font); font-size: var(--display-2-size); line-height: var(--display-2-lh); font-weight: var(--display-2-weight); letter-spacing: var(--display-2-tracking); color: var(--text-strong); }
+.text-display-3 { font-family: var(--display-3-font); font-size: var(--display-3-size); line-height: var(--display-3-lh); font-weight: var(--display-3-weight); letter-spacing: var(--display-3-tracking); color: var(--text-strong); }
+
+.text-h1 { font-family: var(--h1-font); font-size: var(--h1-size); line-height: var(--h1-lh); font-weight: var(--h1-weight); letter-spacing: var(--h1-tracking); color: var(--text-strong); }
+.text-h2 { font-family: var(--h2-font); font-size: var(--h2-size); line-height: var(--h2-lh); font-weight: var(--h2-weight); letter-spacing: var(--h2-tracking); color: var(--text-strong); }
+.text-h3 { font-family: var(--h3-font); font-size: var(--h3-size); line-height: var(--h3-lh); font-weight: var(--h3-weight); letter-spacing: var(--h3-tracking); color: var(--text-strong); }
+
+.text-title-1 { font-family: var(--title-1-font); font-size: var(--title-1-size); line-height: var(--title-1-lh); font-weight: var(--title-1-weight); letter-spacing: var(--title-1-tracking); color: var(--text-strong); }
+.text-title-2 { font-family: var(--title-2-font); font-size: var(--title-2-size); line-height: var(--title-2-lh); font-weight: var(--title-2-weight); color: var(--text-strong); }
+.text-title-3 { font-family: var(--title-3-font); font-size: var(--title-3-size); line-height: var(--title-3-lh); font-weight: var(--title-3-weight); color: var(--text-strong); }
+
+.text-body-lg { font-family: var(--body-lg-font); font-size: var(--body-lg-size); line-height: var(--body-lg-lh); }
+.text-body    { font-family: var(--body-font); font-size: var(--body-size); line-height: var(--body-lh); }
+.text-body-sm { font-family: var(--body-sm-font); font-size: var(--body-sm-size); line-height: var(--body-sm-lh); }
+
+.text-prose { font-family: var(--prose-font); font-size: var(--prose-size); line-height: var(--prose-lh); font-weight: var(--prose-weight); color: var(--text-body); max-width: var(--reading-measure); }
+
+.text-label   { font-family: var(--label-font); font-size: var(--label-size); line-height: var(--label-lh); font-weight: var(--label-weight); }
+.text-caption { font-family: var(--caption-font); font-size: var(--caption-size); line-height: var(--caption-lh); color: var(--text-muted); }
+
+.text-overline { font-family: var(--overline-font); font-size: var(--overline-size); line-height: var(--overline-lh); font-weight: var(--overline-weight); letter-spacing: var(--overline-tracking); text-transform: uppercase; color: var(--text-muted); }
+
+.text-code { font-family: var(--code-font); font-size: var(--code-size); line-height: var(--code-lh); }
+
+/* ---- Color helpers --------------------------------------------------- */
+.text-muted  { color: var(--text-muted); }
+.text-subtle { color: var(--text-subtle); }
+.text-accent { color: var(--accent); }

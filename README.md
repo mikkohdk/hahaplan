@@ -1,0 +1,66 @@
+# hahaplan
+
+Web toolkit for running live comedy lineup shows and open mics: the host runs
+the evening from a phone, a stage display keeps every performer on time, and
+comedians in the back room follow along on their own phones. No apps, no
+accounts — everyone joins via a link or QR code.
+
+Full requirements: [docs/spec.md](docs/spec.md). Design system: **Margin**
+(`web/src/margin/`, currently the CSS lifted from world-river; the full kit
+gets swapped in when exported).
+
+## Status
+
+- ✅ **P0.1** — server: show model, master clock, WebSocket full-state
+  broadcast, join URLs + QR, SQLite persistence (`node:sqlite`, survives restarts)
+- ✅ Working shells for host / stage / follow pages (create show, build lineup,
+  start/next/pause/resume, live countdown everywhere)
+- ⏭ **P0.2** — host app polish: drag-and-drop reorder, per-act thresholds, breaks UX
+- ⏭ **P0.3** — stage display polish: full overtime escalation ladder, legibility pass
+
+## Run it
+
+```
+npm install
+npm run dev
+```
+
+- Web app: http://localhost:5173 (Vite dev server, proxies to the API)
+- API/WS server: http://localhost:8787
+
+Create a show on the landing page — you land on the host view; the Share card
+has the QR codes for the stage display and the follow view.
+
+## Scripts
+
+| Script | What it does |
+|---|---|
+| `npm run dev` | Server (tsx watch) + web (Vite) together |
+| `npm run smoke` | End-to-end WebSocket lifecycle test (needs a running server) |
+| `npm run typecheck` | Type-checks server and web |
+| `npm run build` | Production build of the web app into `web/dist` |
+| `npm start` | Serves API + built frontend as one process (production mode) |
+
+## Layout
+
+```
+shared/protocol.ts   message schemas + clock math — the single source of truth,
+                     imported by both server and web
+server/              Fastify + WebSocket server, SQLite persistence
+web/                 React SPA: / (create), /show/{id}/host|stage|follow
+web/src/margin/      Margin design system CSS (tokens + components)
+scripts/smoke.ts     e2e lifecycle test
+docs/spec.md         requirements specification
+```
+
+## Architecture notes
+
+- **The clock never ticks over the network.** The server broadcasts clock
+  *changes* (`startedAtMs`, `accumulatedMs`, status); every client renders the
+  countdown locally, corrected by a per-message server-time offset.
+- **Full-state broadcast.** Every mutation broadcasts the entire show state
+  (it's tiny). Reconnect is therefore identical to connect — no sync logic.
+- **Running act is snapshotted** into the clock segment when it starts, so
+  live lineup edits can never disturb the timer on stage.
+- **Auth**: the host URL carries a secret token (then stored in
+  localStorage); stage/follow URLs are harmless and shareable.

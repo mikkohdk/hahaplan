@@ -1,0 +1,329 @@
+/* ==========================================================================
+   Margin — Component styles
+   Token-driven classes for the React primitives. Shipped to consumers via
+   styles.css, so a plain <button class="mg-btn mg-btn--primary"> works even
+   without React. The JSX components are thin wrappers over these classes.
+   ========================================================================== */
+
+/* ============================ BUTTON ================================== */
+.mg-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-md);
+  padding: 0 var(--space-4);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-strong);
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: var(--transition-colors), transform var(--duration-fast) var(--ease-out);
+}
+.mg-btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.mg-btn:active { transform: translateY(0.5px); }
+.mg-btn:disabled, .mg-btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.5; transform: none; }
+.mg-btn svg { width: 1.05em; height: 1.05em; flex: none; }
+
+.mg-btn--sm { height: var(--control-sm); padding: 0 var(--space-3); font-size: var(--fs-sm); border-radius: var(--radius-sm); }
+.mg-btn--lg { height: var(--control-lg); padding: 0 var(--space-5); font-size: var(--fs-md); }
+.mg-btn--block { display: flex; width: 100%; }
+
+/* Primary — monochrome ink */
+.mg-btn--primary { background: var(--ink-0); color: var(--text-on-inverse); box-shadow: var(--shadow-xs); }
+.mg-btn--primary:hover:not(:disabled) { background: #000; }
+.mg-btn--primary:active:not(:disabled) { background: var(--ink-1); }
+
+/* Accent — cobalt fill */
+.mg-btn--accent { background: var(--accent); color: var(--text-on-accent); box-shadow: var(--shadow-xs); }
+.mg-btn--accent:hover:not(:disabled) { background: var(--accent-hover); }
+.mg-btn--accent:active:not(:disabled) { background: var(--accent-press); }
+
+/* Secondary — paper with border */
+.mg-btn--secondary { background: var(--surface-card); color: var(--text-strong); border-color: var(--border-default); box-shadow: var(--shadow-xs); }
+.mg-btn--secondary:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--border-strong); }
+.mg-btn--secondary:active:not(:disabled) { background: var(--surface-active); }
+
+/* Ghost — text only */
+.mg-btn--ghost { background: transparent; color: var(--text-body); }
+.mg-btn--ghost:hover:not(:disabled) { background: var(--surface-hover); }
+.mg-btn--ghost:active:not(:disabled) { background: var(--surface-active); }
+
+/* Danger */
+.mg-btn--danger { background: var(--danger); color: #fff; box-shadow: var(--shadow-xs); }
+.mg-btn--danger:hover:not(:disabled) { background: var(--red-strong); }
+
+.mg-btn__spinner { width: 1em; height: 1em; }
+
+/* ============================ ICON BUTTON ============================= */
+.mg-iconbtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--control-md); height: var(--control-md);
+  padding: 0; border: 1px solid transparent; border-radius: var(--radius-md);
+  background: transparent; color: var(--text-body); cursor: pointer;
+  transition: var(--transition-colors), transform var(--duration-fast) var(--ease-out);
+}
+.mg-iconbtn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.mg-iconbtn:active { transform: translateY(0.5px); }
+.mg-iconbtn:disabled { cursor: not-allowed; opacity: 0.5; }
+.mg-iconbtn svg { width: 18px; height: 18px; }
+.mg-iconbtn--sm { width: var(--control-sm); height: var(--control-sm); border-radius: var(--radius-sm); }
+.mg-iconbtn--sm svg { width: 16px; height: 16px; }
+.mg-iconbtn--lg { width: var(--control-lg); height: var(--control-lg); }
+.mg-iconbtn--lg svg { width: 20px; height: 20px; }
+.mg-iconbtn--ghost:hover:not(:disabled) { background: var(--surface-hover); }
+.mg-iconbtn--secondary { border-color: var(--border-default); background: var(--surface-card); }
+.mg-iconbtn--secondary:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--border-strong); }
+.mg-iconbtn--solid { background: var(--ink-0); color: var(--text-on-inverse); }
+.mg-iconbtn--solid:hover:not(:disabled) { background: #000; }
+
+/* ============================ CARD =================================== */
+.mg-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: clip;
+}
+.mg-card--flat { box-shadow: none; }
+.mg-card--raised { box-shadow: var(--shadow-md); border-color: transparent; }
+.mg-card--interactive { cursor: pointer; transition: box-shadow var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out), border-color var(--duration-normal) var(--ease-out); }
+.mg-card--interactive:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--border-default); }
+.mg-card__header { padding: var(--space-5) var(--space-5) var(--space-3); }
+.mg-card__body   { padding: var(--space-5); }
+.mg-card__footer { padding: var(--space-3) var(--space-5) var(--space-5); display: flex; gap: var(--space-2); }
+.mg-card__header + .mg-card__body { padding-top: 0; }
+
+/* ============================ BADGE ================================== */
+.mg-badge {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  height: 22px; padding: 0 var(--space-2);
+  font-family: var(--font-sans); font-size: var(--fs-xs); font-weight: var(--fw-semibold);
+  line-height: 1; border-radius: var(--radius-sm);
+  background: var(--surface-sunken); color: var(--text-body);
+  border: 1px solid transparent;
+}
+.mg-badge svg { width: 12px; height: 12px; }
+.mg-badge--accent  { background: var(--accent-tint); color: var(--accent-on-tint); }
+.mg-badge--success { background: var(--success-surface); color: var(--success-text); }
+.mg-badge--warning { background: var(--warning-surface); color: var(--warning-text); }
+.mg-badge--danger  { background: var(--danger-surface); color: var(--danger-text); }
+.mg-badge--outline { background: transparent; border-color: var(--border-default); color: var(--text-muted); }
+.mg-badge--dot::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ============================ TAG (chip) ============================= */
+.mg-tag {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  height: var(--control-sm); padding: 0 var(--space-1) 0 var(--space-3);
+  font-family: var(--font-sans); font-size: var(--fs-sm); font-weight: var(--fw-medium);
+  color: var(--text-body); background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
+}
+.mg-tag--plain { padding-right: var(--space-3); }
+.mg-tag__remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border: 0; border-radius: 50%;
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  transition: var(--transition-colors);
+}
+.mg-tag__remove:hover { background: var(--surface-active); color: var(--text-strong); }
+.mg-tag__remove svg { width: 12px; height: 12px; }
+
+/* ============================ AVATAR ================================= */
+.mg-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; flex: none;
+  border-radius: var(--radius-round); overflow: hidden;
+  background: var(--cobalt-0); color: var(--accent-on-tint);
+  font-family: var(--font-sans); font-size: var(--fs-sm); font-weight: var(--fw-semibold);
+  line-height: 1; user-select: none;
+  box-shadow: var(--ring-inset);
+}
+.mg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.mg-avatar--square { border-radius: var(--radius-md); }
+.mg-avatar--xs { width: 22px; height: 22px; font-size: var(--fs-2xs); }
+.mg-avatar--sm { width: 28px; height: 28px; font-size: var(--fs-xs); }
+.mg-avatar--lg { width: 48px; height: 48px; font-size: var(--fs-md); }
+.mg-avatar--xl { width: 64px; height: 64px; font-size: var(--fs-xl); }
+
+/* ============================ SPINNER =============================== */
+.mg-spinner { display: inline-block; width: 18px; height: 18px; color: currentColor; animation: mg-spin 0.7s linear infinite; }
+.mg-spinner circle { opacity: 0.25; }
+.mg-spinner path { opacity: 0.9; }
+@keyframes mg-spin { to { transform: rotate(360deg); } }
+
+/* ============================ DIVIDER =============================== */
+.mg-divider { border: 0; height: 1px; background: var(--border-subtle); margin: 0; }
+.mg-divider--vertical { width: 1px; height: auto; align-self: stretch; }
+
+/* ============================ FIELD ================================= */
+.mg-field { display: flex; flex-direction: column; gap: var(--space-2); }
+.mg-field__label { font-family: var(--font-sans); font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--text-strong); display: inline-flex; gap: var(--space-1); }
+.mg-field__req { color: var(--danger); }
+.mg-field__hint { font-size: var(--fs-xs); color: var(--text-muted); }
+.mg-field__error { font-size: var(--fs-xs); color: var(--danger-text); display: inline-flex; align-items: center; gap: var(--space-1); }
+.mg-field__error svg { width: 13px; height: 13px; }
+
+/* ============================ INPUT ================================= */
+.mg-input, .mg-textarea, .mg-select {
+  width: 100%;
+  font-family: var(--font-sans); font-size: var(--fs-base); color: var(--text-strong);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default); border-radius: var(--radius-md);
+  transition: var(--transition-colors);
+  appearance: none;
+}
+.mg-input { height: var(--control-md); padding: 0 var(--space-3); }
+.mg-input::placeholder, .mg-textarea::placeholder { color: var(--text-subtle); }
+.mg-input:hover, .mg-textarea:hover, .mg-select:hover { border-color: var(--border-strong); }
+.mg-input:focus, .mg-textarea:focus, .mg-select:focus { outline: none; border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+.mg-input:disabled, .mg-textarea:disabled, .mg-select:disabled { background: var(--surface-sunken); color: var(--text-disabled); cursor: not-allowed; }
+.mg-input--invalid, .mg-textarea--invalid, .mg-select--invalid { border-color: var(--danger); }
+.mg-input--invalid:focus, .mg-textarea--invalid:focus, .mg-select--invalid:focus { box-shadow: 0 0 0 3px rgba(196,54,43,0.22); }
+.mg-input--sm { height: var(--control-sm); font-size: var(--fs-sm); }
+.mg-input--lg { height: var(--control-lg); }
+
+.mg-textarea { min-height: 92px; padding: var(--space-3); line-height: var(--lh-normal); resize: vertical; }
+
+/* Input group with affixes */
+.mg-inputgroup { position: relative; display: flex; align-items: center; }
+.mg-inputgroup .mg-input { padding-left: calc(var(--space-3) + 22px); }
+.mg-inputgroup__icon { position: absolute; left: var(--space-3); display: inline-flex; color: var(--text-subtle); pointer-events: none; }
+.mg-inputgroup__icon svg { width: 16px; height: 16px; }
+
+/* ============================ SELECT ================================ */
+.mg-select { height: var(--control-md); padding: 0 calc(var(--space-3) + 20px) 0 var(--space-3);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B6760' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right var(--space-3) center; cursor: pointer;
+}
+
+/* ============================ CHECKBOX / RADIO ====================== */
+.mg-check { display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer; font-family: var(--font-sans); font-size: var(--fs-base); color: var(--text-body); user-select: none; }
+.mg-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+.mg-check__box {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 18px; height: 18px; border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-xs); background: var(--surface-card);
+  color: #fff; transition: var(--transition-colors);
+}
+.mg-check__box svg { width: 12px; height: 12px; opacity: 0; transform: scale(0.6); transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring); }
+.mg-check input:checked + .mg-check__box { background: var(--accent); border-color: var(--accent); }
+.mg-check input:checked + .mg-check__box svg { opacity: 1; transform: scale(1); }
+.mg-check input:focus-visible + .mg-check__box { box-shadow: var(--shadow-focus); }
+.mg-check input:disabled ~ * { opacity: 0.5; }
+.mg-check--radio .mg-check__box { border-radius: 50%; }
+.mg-check--radio .mg-check__dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; opacity: 0; transform: scale(0.4); transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-spring); }
+.mg-check--radio input:checked + .mg-check__box .mg-check__dot { opacity: 1; transform: scale(1); }
+
+/* ============================ SWITCH =============================== */
+.mg-switch { display: inline-flex; align-items: center; gap: var(--space-3); cursor: pointer; font-family: var(--font-sans); font-size: var(--fs-base); color: var(--text-body); user-select: none; }
+.mg-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.mg-switch__track {
+  position: relative; flex: none; width: 38px; height: 22px;
+  background: var(--border-strong); border-radius: var(--radius-pill);
+  transition: background-color var(--duration-normal) var(--ease-out);
+}
+.mg-switch__thumb {
+  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
+  background: #fff; border-radius: 50%; box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+.mg-switch input:checked + .mg-switch__track { background: var(--accent); }
+.mg-switch input:checked + .mg-switch__track .mg-switch__thumb { transform: translateX(16px); }
+.mg-switch input:focus-visible + .mg-switch__track { box-shadow: var(--shadow-focus); }
+.mg-switch input:disabled ~ * { opacity: 0.5; }
+
+/* ============================ TABS ================================= */
+.mg-tabs { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--border-subtle); }
+.mg-tab {
+  position: relative; display: inline-flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-3) var(--space-3); margin-bottom: -1px;
+  font-family: var(--font-sans); font-size: var(--fs-base); font-weight: var(--fw-medium);
+  color: var(--text-muted); background: none; border: 0; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: var(--transition-colors);
+}
+.mg-tab:hover { color: var(--text-strong); }
+.mg-tab--active { color: var(--text-strong); font-weight: var(--fw-semibold); border-bottom-color: var(--accent); }
+.mg-tab:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius: var(--radius-xs); }
+.mg-tab svg { width: 16px; height: 16px; }
+
+/* ============================ BREADCRUMBS ========================== */
+.mg-breadcrumbs { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-sans); font-size: var(--fs-sm); color: var(--text-muted); }
+.mg-breadcrumbs a { color: var(--text-muted); text-decoration: none; transition: var(--transition-colors); }
+.mg-breadcrumbs a:hover { color: var(--text-strong); }
+.mg-breadcrumbs__sep { color: var(--text-subtle); }
+.mg-breadcrumbs__current { color: var(--text-strong); font-weight: var(--fw-medium); }
+
+/* ============================ CALLOUT / BANNER ===================== */
+.mg-callout {
+  display: flex; gap: var(--space-3); padding: var(--space-4);
+  border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
+  background: var(--surface-sunken); color: var(--text-body); font-size: var(--fs-base);
+}
+.mg-callout__icon { flex: none; margin-top: 1px; }
+.mg-callout__icon svg { width: 18px; height: 18px; }
+.mg-callout__title { font-weight: var(--fw-semibold); color: var(--text-strong); margin-bottom: var(--space-1); }
+.mg-callout--accent  { background: var(--accent-tint); border-color: transparent; color: var(--accent-on-tint); }
+.mg-callout--success { background: var(--success-surface); border-color: transparent; color: var(--success-text); }
+.mg-callout--warning { background: var(--warning-surface); border-color: transparent; color: var(--warning-text); }
+.mg-callout--danger  { background: var(--danger-surface); border-color: transparent; color: var(--danger-text); }
+
+/* ============================ TOOLTIP ============================== */
+.mg-tooltip-wrap { position: relative; display: inline-flex; }
+.mg-tooltip {
+  position: absolute; z-index: 50; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);
+  background: var(--ink-0); color: var(--paper-0);
+  font-family: var(--font-sans); font-size: var(--fs-xs); font-weight: var(--fw-medium); line-height: 1.3;
+  white-space: nowrap; box-shadow: var(--shadow-md);
+  opacity: 0; pointer-events: none; transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+.mg-tooltip-wrap:hover .mg-tooltip, .mg-tooltip-wrap:focus-within .mg-tooltip { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+.mg-tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--ink-0); }
+
+/* ============================ DIALOG ============================== */
+.mg-dialog__overlay {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+  padding: var(--space-6); background: rgba(26,25,22,0.42);
+  backdrop-filter: blur(2px); animation: mg-fade var(--duration-normal) var(--ease-out);
+}
+.mg-dialog {
+  width: 100%; max-width: 480px; background: var(--surface-card);
+  border-radius: var(--radius-xl); box-shadow: var(--shadow-xl);
+  animation: mg-pop var(--duration-normal) var(--ease-out); overflow: clip;
+}
+.mg-dialog__header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); padding: var(--space-5) var(--space-5) var(--space-2); }
+.mg-dialog__title { font-family: var(--font-sans); font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--text-strong); }
+.mg-dialog__body { padding: var(--space-2) var(--space-5) var(--space-5); color: var(--text-body); font-size: var(--fs-base); line-height: var(--lh-normal); }
+.mg-dialog__footer { display: flex; justify-content: flex-end; gap: var(--space-2); padding: var(--space-4) var(--space-5); background: var(--surface-sunken); border-top: 1px solid var(--border-subtle); }
+@keyframes mg-fade { from { opacity: 0; } }
+@keyframes mg-pop { from { opacity: 0; transform: translateY(8px) scale(0.98); } }
+
+/* ============================ TOAST =============================== */
+.mg-toast {
+  display: flex; align-items: flex-start; gap: var(--space-3);
+  width: 100%; max-width: 380px; padding: var(--space-3) var(--space-4);
+  background: var(--surface-inverse); color: var(--text-on-inverse);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-lg);
+  font-family: var(--font-sans); font-size: var(--fs-base);
+  animation: mg-toast-in var(--duration-normal) var(--ease-out);
+}
+.mg-toast__icon { flex: none; margin-top: 1px; }
+.mg-toast__icon svg { width: 18px; height: 18px; }
+.mg-toast--success .mg-toast__icon { color: var(--green); }
+.mg-toast--danger .mg-toast__icon { color: var(--red); }
+.mg-toast__title { font-weight: var(--fw-semibold); }
+.mg-toast__msg { opacity: 0.8; font-size: var(--fs-sm); margin-top: 2px; }
+.mg-toast__close { margin-left: auto; background: none; border: 0; color: inherit; opacity: 0.6; cursor: pointer; padding: 2px; }
+.mg-toast__close:hover { opacity: 1; }
+@keyframes mg-toast-in { from { opacity: 0; transform: translateY(10px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mg-dialog, .mg-dialog__overlay, .mg-toast { animation: none; }
+  * { scroll-behavior: auto; }
+}
