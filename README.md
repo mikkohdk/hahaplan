@@ -13,10 +13,14 @@ gets swapped in when exported).
 
 - ✅ **P0.1** — server: show model, master clock, WebSocket full-state
   broadcast, join URLs + QR, SQLite persistence (`node:sqlite`, survives restarts)
-- ✅ Working shells for host / stage / follow pages (create show, build lineup,
-  start/next/pause/resume, live countdown everywhere)
-- ⏭ **P0.2** — host app polish: drag-and-drop reorder, per-act thresholds, breaks UX
-- ⏭ **P0.3** — stage display polish: full overtime escalation ladder, legibility pass
+- ✅ Host / stage / follow pages: create show, build lineup, start/next/pause/resume,
+  live countdown everywhere
+- ✅ **P0.3** — stage display: full four-state overtime ladder — white-on-black →
+  red final minute → red/black blink → escalating multicolor blink that speeds
+  up the longer an act runs over
+- ✅ Host Plan tab: add / reorder (↑ ↓) / delete acts and breaks, edit an act's
+  length inline, live editing during a show
+- ⏭ **P0.2** — remaining: drag-and-drop reorder, three-tab host layout
 
 ## Run it
 
@@ -40,6 +44,23 @@ has the QR codes for the stage display and the follow view.
 | `npm run typecheck` | Type-checks server and web |
 | `npm run build` | Production build of the web app into `web/dist` |
 | `npm start` | Serves API + built frontend as one process (production mode) |
+
+## Deploy
+
+The whole thing is one Node process (API + WebSocket + static SPA), so any host
+that runs a container works. A `Dockerfile` is included:
+
+```
+docker build -t hahaplan .
+docker run -p 8787:8787 hahaplan
+```
+
+Deploys as-is to **Koyeb's free tier** (git-connected Docker build, no volume) —
+set the service port to `8787`. The SQLite file lives under `DATA_DIR`
+(`/app/data`, ephemeral by default); to keep shows across redeploys, run on a
+host with a persistent disk mounted at `/app/data`. CI
+(`.github/workflows/ci.yml`) type-checks, builds, and runs the end-to-end smoke
+test on every push and PR.
 
 ## Layout
 

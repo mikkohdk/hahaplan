@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Smoke test (full show lifecycle over WebSocket)
+        run: |
+          npm start &
+          echo $! > server.pid
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8787/api/shows/ci-health || true)
+            if [ "$code" != "000" ]; then echo "server responding ($code)"; break; fi
+            sleep 1
+          done
+          npm run smoke
+          kill "$(cat server.pid)" || true
