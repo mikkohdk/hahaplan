@@ -62,6 +62,8 @@ function broadcast(showId: string, state: ShowState): void {
 const app = Fastify({ logger: false });
 await app.register(websocket);
 
+app.get("/api/health", async () => ({ ok: true }));
+
 app.post("/api/shows", async (req, reply) => {
   const body = z
     .object({ name: z.string().min(1).max(120).optional() })
@@ -143,6 +145,27 @@ setInterval(() => {
     }
   }
 }, 60_000).unref();
+
+// Keep-warm: while any show is running, ping our own public URL so the host
+// (e.g. Render free tier) doesn't spin the instance down mid-show. The request
+// leaves and returns through the platform edge, counting as inbound activity.
+// It stops itself once no show is live, so idle time still spins down and the
+// monthly instance-hours aren't burned between shows.
+const SELF_URL = process.env.RENDER_EXTERNAL_URL;
+if (SELF_URL) {
+  const anyShowRunning = () => {
+    for (const show of shows.values()) {
+      if (show.state.clock.status === "running") return true;
+    }
+    return false;
+  };
+  setInterval(() => {
+    if (anyShowRunning()) {
+      fetch(`${SELF_URL}/api/health`).catch(() => {});
+    }
+  }, 10 * 60 * 1000).unref();
+  console.log("Keep-warm self-ping enabled (active only while a show is running).");
+}
 
 /* --------------------------------------------- static frontend (prod) --- */
 
