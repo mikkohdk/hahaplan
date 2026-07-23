@@ -7,7 +7,6 @@ import {
   elapsedMs,
   formatClock,
   nextAct,
-  remainingMs,
 } from "../../../shared/protocol";
 import { claimHostToken } from "../lib/api";
 import { useShow, useTick } from "../lib/useShow";
@@ -60,7 +59,6 @@ export function HostPage() {
   const { clock } = state;
   const now = serverNow();
   const seg = clock.segment;
-  const remaining = remainingMs(clock, now);
   const upNext = nextAct(state);
 
   function addAct(kind: Act["kind"]) {
@@ -131,9 +129,7 @@ export function HostPage() {
             </div>
           </div>
           <div className="now-clock">
-            {remaining !== null
-              ? formatClock(remaining)
-              : formatClock(elapsedMs(clock, now))}
+            {formatClock(elapsedMs(clock, now))}
           </div>
         </div>
         <div className="controls" style={{ marginTop: "var(--space-4)" }}>
@@ -162,7 +158,7 @@ export function HostPage() {
           )}
           <div className="row" style={{ justifyContent: "center" }}>
             <span className="text-caption">
-              {seg?.kind === "act" ? `elapsed ${formatClock(elapsedMs(clock, now))}` : ""}
+              {seg?.kind === "act" ? `of ${formatClock(seg.durationSec * 1000)}` : ""}
             </span>
           </div>
         </div>

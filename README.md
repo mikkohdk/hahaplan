@@ -55,12 +55,13 @@ docker build -t hahaplan .
 docker run -p 8787:8787 hahaplan
 ```
 
-Deploys as-is to **Koyeb's free tier** (git-connected Docker build, no volume) —
-set the service port to `8787`. The SQLite file lives under `DATA_DIR`
-(`/app/data`, ephemeral by default); to keep shows across redeploys, run on a
-host with a persistent disk mounted at `/app/data`. CI
-(`.github/workflows/ci.yml`) type-checks, builds, and runs the end-to-end smoke
-test on every push and PR.
+Runs on **Render's free tier** as a git-connected Docker web service that
+auto-deploys on every push to `main` (Render supplies `$PORT`, which the server
+reads — no config needed). The SQLite file lives under `DATA_DIR` (`/app/data`,
+ephemeral on the free tier, so shows reset when the instance restarts); to keep
+shows across restarts, use a paid instance with a persistent disk mounted at
+`/app/data`. CI (`.github/workflows/ci.yml`) type-checks, builds, and runs the
+end-to-end smoke test on every push and PR.
 
 ## Layout
 
