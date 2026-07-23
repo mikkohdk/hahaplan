@@ -9,6 +9,14 @@ import {
   nextAct,
 } from "../../../shared/protocol";
 import { claimHostToken } from "../lib/api";
+import { ChevronDown, ChevronUp, X } from "../lib/icons";
+import {
+  deleteTemplate,
+  loadTemplates,
+  saveTemplate,
+  templateActs,
+  type Template,
+} from "../lib/templates";
 import { useShow, useTick } from "../lib/useShow";
 
 function useQr(url: string): string | null {
@@ -29,6 +37,7 @@ export function HostPage() {
 
   const [newName, setNewName] = useState("");
   const [newMinutes, setNewMinutes] = useState(5);
+  const [templates, setTemplates] = useState<Template[]>(() => loadTemplates());
 
   const stageUrl = `${location.origin}/show/${showId}/stage`;
   const followUrl = `${location.origin}/show/${showId}/follow`;
@@ -89,6 +98,21 @@ export function HostPage() {
 
   function removeAct(id: string) {
     setActs(state!.acts.filter((a) => a.id !== id));
+  }
+
+  function onSaveTemplate() {
+    const name = window.prompt("Save this lineup as a template — name:", state!.name);
+    if (name === null) return;
+    setTemplates(saveTemplate(name, state!.acts));
+  }
+
+  function onLoadTemplate(t: Template) {
+    if (
+      state!.acts.length > 0 &&
+      !window.confirm(`Replace the current lineup with "${t.name}"?`)
+    )
+      return;
+    setActs(templateActs(t));
   }
 
   function moveAct(id: string, dir: -1 | 1) {
@@ -211,11 +235,11 @@ export function HostPage() {
                   min
                 </label>
                 <button className="mg-iconbtn mg-iconbtn--sm mg-iconbtn--ghost" title="Move up"
-                  onClick={() => moveAct(a.id, -1)}>↑</button>
+                  onClick={() => moveAct(a.id, -1)}><ChevronUp /></button>
                 <button className="mg-iconbtn mg-iconbtn--sm mg-iconbtn--ghost" title="Move down"
-                  onClick={() => moveAct(a.id, 1)}>↓</button>
+                  onClick={() => moveAct(a.id, 1)}><ChevronDown /></button>
                 <button className="mg-iconbtn mg-iconbtn--sm mg-iconbtn--ghost" title="Remove"
-                  disabled={onStage} onClick={() => removeAct(a.id)}>✕</button>
+                  disabled={onStage} onClick={() => removeAct(a.id)}><X /></button>
               </li>
             );
           })}
@@ -247,6 +271,44 @@ export function HostPage() {
             Add break
           </button>
         </div>
+      </div>
+
+      {/* -------------------------------------------------- templates ---- */}
+      <div className="mg-card">
+        <div className="text-title-2">Templates</div>
+        <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
+          Save this lineup to reuse for a recurring night, or load a saved one.
+          Stored on this device.
+        </p>
+        <div className="row row--wrap" style={{ marginTop: "var(--space-3)" }}>
+          <button
+            className="mg-btn mg-btn--secondary"
+            disabled={state.acts.length === 0}
+            onClick={onSaveTemplate}
+          >
+            Save this lineup
+          </button>
+        </div>
+        {templates.length > 0 && (
+          <ul className="lineup" style={{ marginTop: "var(--space-3)" }}>
+            {templates.map((t) => (
+              <li key={t.id}>
+                <span className="act-name text-body">{t.name}</span>
+                <span className="text-caption">{t.acts.length} acts</span>
+                <button className="mg-btn mg-btn--ghost mg-btn--sm" onClick={() => onLoadTemplate(t)}>
+                  Load
+                </button>
+                <button
+                  className="mg-iconbtn mg-iconbtn--sm mg-iconbtn--ghost"
+                  title="Delete template"
+                  onClick={() => setTemplates(deleteTemplate(t.id))}
+                >
+                  <X />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* ------------------------------------------------------ share ---- */}
