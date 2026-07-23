@@ -8,9 +8,19 @@ import { useShow, useTick } from "../lib/useShow";
  */
 export function FollowPage() {
   const { showId = "" } = useParams();
-  const { state, connected, serverNow } = useShow(showId);
+  const { state, connected, notFound, serverNow } = useShow(showId);
   useTick(500);
 
+  if (notFound) {
+    return (
+      <div className="page" style={{ paddingTop: "20vh", textAlign: "center" }}>
+        <h3 className="text-h3">Show ended</h3>
+        <p className="text-body text-muted" style={{ marginTop: "var(--space-2)" }}>
+          This show is no longer available.
+        </p>
+      </div>
+    );
+  }
   if (!state) {
     return (
       <div className="page row" style={{ justifyContent: "center", paddingTop: "20vh" }}>

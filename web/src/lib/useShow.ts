@@ -15,6 +15,7 @@ import type {
 export function useShow(showId: string) {
   const [state, setState] = useState<ShowState | null>(null);
   const [connected, setConnected] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const offsetRef = useRef(0);
   const wsRef = useRef<WebSocket | null>(null);
@@ -42,8 +43,15 @@ export function useShow(showId: string) {
           setLastError(msg.message);
         }
       };
-      ws.onclose = () => {
+      ws.onclose = (ev) => {
         setConnected(false);
+        // 4404 = the server no longer has this show (e.g. the instance restarted
+        // and its storage was ephemeral). Stop retrying and surface it, rather
+        // than reconnecting forever while the UI shows a stale, ticking clock.
+        if (ev.code === 4404) {
+          setNotFound(true);
+          return;
+        }
         if (!disposed) {
           timer = window.setTimeout(connect, Math.min(5000, 500 * 2 ** retries++));
         }
@@ -67,7 +75,7 @@ export function useShow(showId: string) {
   /** Best estimate of the server's clock right now. */
   const serverNow = useCallback(() => Date.now() + offsetRef.current, []);
 
-  return { state, connected, lastError, sendAction, serverNow };
+  return { state, connected, notFound, lastError, sendAction, serverNow };
 }
 
 /** Re-render on an interval so countdowns tick. */

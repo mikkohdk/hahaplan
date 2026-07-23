@@ -13,9 +13,16 @@ import { useShow, useTick } from "../lib/useShow";
  */
 export function StagePage() {
   const { showId = "" } = useParams();
-  const { state, connected, serverNow } = useShow(showId);
+  const { state, connected, notFound, serverNow } = useShow(showId);
   useTick(100);
 
+  if (notFound) {
+    return (
+      <div className="stage">
+        <div className="stage__label">show ended</div>
+      </div>
+    );
+  }
   if (!state) {
     return (
       <div className="stage">

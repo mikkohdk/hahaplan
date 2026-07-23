@@ -32,7 +32,7 @@ const clampMinutes = (n: number) => Math.min(240, Math.max(1, Math.round(n || 1)
 export function HostPage() {
   const { showId = "" } = useParams();
   const token = useMemo(() => claimHostToken(showId), [showId]);
-  const { state, connected, lastError, sendAction, serverNow } = useShow(showId);
+  const { state, connected, notFound, lastError, sendAction, serverNow } = useShow(showId);
   useTick(200);
 
   const [newName, setNewName] = useState("");
@@ -51,6 +51,24 @@ export function HostPage() {
           This device has no host key for this show. Open the original host
           link (it carries the key) on this device.
         </div>
+      </div>
+    );
+  }
+  if (notFound) {
+    return (
+      <div className="page" style={{ paddingTop: "16vh", textAlign: "center" }}>
+        <h2 className="text-h3">This show is no longer available</h2>
+        <p className="text-body text-muted" style={{ marginTop: "var(--space-3)" }}>
+          The server restarted and this show wasn't saved — on the free tier,
+          shows don't persist across restarts. Start a fresh one to keep going.
+        </p>
+        <a
+          className="mg-btn mg-btn--primary mg-btn--lg"
+          href="/"
+          style={{ marginTop: "var(--space-5)" }}
+        >
+          Create a new show
+        </a>
       </div>
     );
   }
