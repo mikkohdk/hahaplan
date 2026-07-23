@@ -21,6 +21,10 @@
   gap: var(--space-3);
 }
 
+/* The app uses bare .mg-card (not Margin's .mg-card__body wrapper), so give
+   cards their own interior padding — otherwise content sits flush to the edge. */
+.mg-card { padding: var(--space-5); }
+
 .row {
   display: flex;
   align-items: center;

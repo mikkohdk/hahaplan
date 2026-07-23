@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { elapsedMs, formatClock, nextAct, remainingMs } from "../../../shared/protocol";
+import { elapsedMs, formatClock, nextAct } from "../../../shared/protocol";
 import { useShow, useTick } from "../lib/useShow";
 
 /**
@@ -22,7 +22,6 @@ export function FollowPage() {
   const { clock } = state;
   const seg = clock.segment;
   const now = serverNow();
-  const remaining = remainingMs(clock, now);
   const upNext = nextAct(state);
   const onStageActId = seg?.kind === "act" ? seg.actId : null;
 
@@ -51,7 +50,7 @@ export function FollowPage() {
             {seg?.kind === "act" ? seg.name : seg?.kind === "host" ? "Host" : "—"}
           </div>
           <div className="now-clock" style={{ fontSize: "var(--fs-3xl)" }}>
-            {remaining !== null ? formatClock(remaining) : formatClock(elapsedMs(clock, now))}
+            {formatClock(elapsedMs(clock, now))}
           </div>
         </div>
         <div className="text-caption" style={{ marginTop: "var(--space-2)" }}>
