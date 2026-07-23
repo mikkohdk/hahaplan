@@ -18,7 +18,13 @@ import {
   type ShowState,
 } from "../shared/protocol";
 import { ShowRepo } from "./db";
-import { ShowError, applyAction, createShow, type StoredShow } from "./show";
+import {
+  ShowError,
+  applyAction,
+  autoEndIfAbandoned,
+  createShow,
+  type StoredShow,
+} from "./show";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT ?? 8787);
@@ -125,6 +131,18 @@ setInterval(() => {
     }
   }
 }, 30_000).unref();
+
+// Reap abandoned shows (host forgot Next/End) so zombie shows don't linger.
+setInterval(() => {
+  const now = Date.now();
+  for (const show of shows.values()) {
+    if (autoEndIfAbandoned(show.state, now)) {
+      repo.save(show);
+      broadcast(show.state.id, show.state);
+      console.log(`Auto-ended abandoned show ${show.state.id}`);
+    }
+  }
+}, 60_000).unref();
 
 /* --------------------------------------------- static frontend (prod) --- */
 

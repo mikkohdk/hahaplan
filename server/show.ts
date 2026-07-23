@@ -88,6 +88,28 @@ function beginHostSegment(state: ShowState, now: number): void {
   };
 }
 
+/** How long past a segment's natural end before we treat the show as abandoned. */
+const ABANDON_GRACE_MS = 30 * 60 * 1000;
+
+/**
+ * Reap a show whose host clearly walked off without hitting Next/End: an act
+ * left running far past its length, or a host segment sitting untouched.
+ * Returns true if it ended the show (so the caller can persist + broadcast).
+ */
+export function autoEndIfAbandoned(state: ShowState, now = Date.now()): boolean {
+  const { clock } = state;
+  if (clock.status !== "running" || !clock.segment) return false;
+  const elapsed = elapsedMs(clock, now);
+  const limit =
+    clock.segment.kind === "act"
+      ? clock.segment.durationSec * 1000 + ABANDON_GRACE_MS
+      : ABANDON_GRACE_MS;
+  if (elapsed < limit) return false;
+  finishCurrent(state);
+  state.clock = { status: "ended", segment: null, startedAtMs: null, accumulatedMs: 0 };
+  return true;
+}
+
 export function applyAction(
   state: ShowState,
   action: HostAction,

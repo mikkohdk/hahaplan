@@ -49,8 +49,13 @@ export function FollowPage() {
           <div className="grow text-h3">
             {seg?.kind === "act" ? seg.name : seg?.kind === "host" ? "Host" : "—"}
           </div>
-          <div className="now-clock" style={{ fontSize: "var(--fs-3xl)" }}>
-            {formatClock(elapsedMs(clock, now))}
+          <div className="now-block">
+            <div className="now-clock" style={{ fontSize: "var(--fs-3xl)" }}>
+              {formatClock(elapsedMs(clock, now))}
+            </div>
+            {seg?.kind === "act" && (
+              <div className="clock-target">of {formatClock(seg.durationSec * 1000)}</div>
+            )}
           </div>
         </div>
         <div className="text-caption" style={{ marginTop: "var(--space-2)" }}>
