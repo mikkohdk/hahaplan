@@ -20,6 +20,8 @@ function useQr(url: string): string | null {
   return src;
 }
 
+const clampMinutes = (n: number) => Math.min(240, Math.max(1, Math.round(n || 1)));
+
 export function HostPage() {
   const { showId = "" } = useParams();
   const token = useMemo(() => claimHostToken(showId), [showId]);
@@ -70,11 +72,15 @@ export function HostPage() {
         id: crypto.randomUUID(),
         kind,
         name,
-        durationSec: Math.max(1, newMinutes) * 60,
+        durationSec: clampMinutes(newMinutes) * 60,
         warnBeforeSec: DEFAULT_WARN_BEFORE_SEC,
       },
     ]);
     setNewName("");
+  }
+
+  function updateAct(id: string, patch: Partial<Act>) {
+    setActs(state!.acts.map((a) => (a.id === id ? { ...a, ...patch } : a)));
   }
 
   function removeAct(id: string) {
@@ -134,7 +140,7 @@ export function HostPage() {
           <button
             className="mg-btn mg-btn--primary mg-btn--lg"
             onClick={() => act({ type: "start" })}
-            disabled={clock.status === "running" && seg?.kind === "act"}
+            disabled={seg?.kind === "act"}
           >
             Start
           </button>
@@ -187,7 +193,21 @@ export function HostPage() {
                     <span className="mg-tag" style={{ marginLeft: "var(--space-2)" }}>break</span>
                   )}
                 </span>
-                <span className="text-caption">{Math.round(a.durationSec / 60)} min</span>
+                <label className="act-field" title="Set length in minutes">
+                  <input
+                    key={`min-${a.id}-${a.durationSec}`}
+                    className="mg-input"
+                    type="number"
+                    min={1}
+                    max={240}
+                    defaultValue={Math.round(a.durationSec / 60)}
+                    onBlur={(e) => {
+                      const sec = clampMinutes(Number(e.target.value)) * 60;
+                      if (sec !== a.durationSec) updateAct(a.id, { durationSec: sec });
+                    }}
+                  />
+                  min
+                </label>
                 <button className="mg-iconbtn mg-iconbtn--sm mg-iconbtn--ghost" title="Move up"
                   onClick={() => moveAct(a.id, -1)}>↑</button>
                 <button className="mg-iconbtn mg-iconbtn--sm mg-iconbtn--ghost" title="Move down"
@@ -215,6 +235,7 @@ export function HostPage() {
             max={240}
             value={newMinutes}
             onChange={(e) => setNewMinutes(Number(e.target.value))}
+            title="Set length in minutes"
           />
           <span className="text-caption">min</span>
           <button className="mg-btn mg-btn--secondary" onClick={() => addAct("performer")}>

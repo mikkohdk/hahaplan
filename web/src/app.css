@@ -56,15 +56,26 @@
 .lineup li {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
   padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .lineup li:last-child { border-bottom: none; }
 
-.lineup .act-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lineup .act-name { flex: 1 1 7rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lineup .act-done { text-decoration: line-through; color: var(--text-muted); }
+
+.act-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.act-field input { width: 3.4rem; }
 
 .share-qr { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
 .share-qr img { border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
@@ -110,9 +121,25 @@
 /* Final minute: red screen, black digits (spec §4.2). */
 .stage--warn { background: #D42B1E; color: #000; }
 
-/* Overtime: blink red <-> black. Escalation ladder lands with P0.3. */
+/* Overtime, 0 to -1:00: blink red <-> black (spec §4.2). */
 @keyframes stage-blink {
   0%, 49% { background: #D42B1E; color: #000; }
   50%, 100% { background: #000; color: #D42B1E; }
 }
 .stage--over { animation: stage-blink 1s steps(1) infinite; }
+
+/* Overtime beyond -1:00: escalating multicolor blink cycling white/black,
+   yellow/black, red/black — "impossible to ignore" (spec §4.2). The cycle
+   period comes from --escalate-period, which StagePage shrinks the deeper
+   into overtime we go, so the alarm visibly speeds up. */
+@keyframes stage-escalate {
+  0%,   16% { background: #fff;    color: #000; }
+  17%,  33% { background: #000;    color: #fff; }
+  34%,  50% { background: #E6B800; color: #000; }
+  51%,  66% { background: #000;    color: #E6B800; }
+  67%,  83% { background: #D42B1E; color: #000; }
+  84%, 100% { background: #000;    color: #D42B1E; }
+}
+.stage--escalate {
+  animation: stage-escalate var(--escalate-period, 1.2s) steps(1) infinite;
+}
