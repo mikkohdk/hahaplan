@@ -49,6 +49,16 @@
   line-height: var(--lh-none);
 }
 
+/* Elapsed clock + its set-length target, stacked and right-aligned. */
+.now-block { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); }
+.clock-target {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-lg);
+  color: var(--text-muted);
+  line-height: var(--lh-none);
+}
+
 .lineup {
   list-style: none;
   margin: 0;
@@ -112,6 +122,16 @@
   font-weight: 500;
   font-size: min(30vw, 44vh);
   line-height: 1;
+}
+
+/* Set-length target under the giant clock. Inherits `color` so it stays
+   legible through the warn/overtime colour states. */
+.stage__target {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: min(9vw, 9vh);
+  line-height: 1;
+  opacity: 0.75;
 }
 
 .stage__label {

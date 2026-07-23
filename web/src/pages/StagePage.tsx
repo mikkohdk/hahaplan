@@ -58,9 +58,12 @@ export function StagePage() {
     label = clock.status === "ended" ? "that's the show" : state.name;
   }
 
+  const targetMs = seg?.kind === "act" ? seg.durationSec * 1000 : null;
+
   return (
     <div className={cls} style={style}>
       <div className="stage__clock">{display}</div>
+      {targetMs !== null && <div className="stage__target">of {formatClock(targetMs)}</div>}
       <div className="stage__label">
         {clock.status === "paused" ? "paused" : label}
         {!connected && " · reconnecting"}

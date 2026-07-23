@@ -47,8 +47,14 @@ export function HostPage() {
   }
   if (!state) {
     return (
-      <div className="page row" style={{ justifyContent: "center", paddingTop: "20vh" }}>
-        <span className="mg-spinner" /> <span className="text-muted">Connecting…</span>
+      <div className="page" style={{ paddingTop: "18vh", textAlign: "center" }}>
+        <span className="mg-spinner" />
+        <p className="text-body" style={{ marginTop: "var(--space-4)" }}>
+          {connected ? "Loading your show…" : "Waking the show up…"}
+        </p>
+        <p className="text-caption text-muted" style={{ marginTop: "var(--space-2)" }}>
+          The first open after a quiet spell can take up to a minute — it's working, hang tight.
+        </p>
       </div>
     );
   }
@@ -128,8 +134,13 @@ export function HostPage() {
               {upNext ? `Up next: ${upNext.name}` : "Nobody up next"}
             </div>
           </div>
-          <div className="now-clock">
-            {formatClock(elapsedMs(clock, now))}
+          <div className="now-block">
+            <div className="now-clock">
+              {formatClock(elapsedMs(clock, now))}
+            </div>
+            {seg?.kind === "act" && (
+              <div className="clock-target">of {formatClock(seg.durationSec * 1000)}</div>
+            )}
           </div>
         </div>
         <div className="controls" style={{ marginTop: "var(--space-4)" }}>
@@ -156,11 +167,6 @@ export function HostPage() {
               Pause
             </button>
           )}
-          <div className="row" style={{ justifyContent: "center" }}>
-            <span className="text-caption">
-              {seg?.kind === "act" ? `of ${formatClock(seg.durationSec * 1000)}` : ""}
-            </span>
-          </div>
         </div>
       </div>
 
