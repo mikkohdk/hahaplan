@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { elapsedMs, formatClock, nextAct } from "../../../shared/protocol";
+import { Keywords } from "../components/Keywords";
 import { useShow, useTick } from "../lib/useShow";
 
 /**
@@ -74,17 +75,15 @@ export function FollowPage() {
       </div>
 
       <div className="mg-card">
-        <div className="text-title-2">Locations mentioned</div>
+        <div className="text-title-2">Mentioned</div>
         {state.keywords.length === 0 ? (
           <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
             Nothing yet.
           </p>
         ) : (
           <>
-            <div className="row row--wrap" style={{ marginTop: "var(--space-3)", gap: "var(--space-2)" }}>
-              {state.keywords.map((k) => (
-                <span key={k} className="mg-tag">{k}</span>
-              ))}
+            <div style={{ marginTop: "var(--space-3)" }}>
+              <Keywords keywords={state.keywords} />
             </div>
             <p className="text-caption text-muted" style={{ marginTop: "var(--space-3)" }}>
               Just what was mentioned — ask the host who said it or why.

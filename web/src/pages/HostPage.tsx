@@ -8,6 +8,7 @@ import {
   formatClock,
   nextAct,
 } from "../../../shared/protocol";
+import { Keywords } from "../components/Keywords";
 import { claimHostToken } from "../lib/api";
 import { ChevronDown, ChevronUp, X } from "../lib/icons";
 import {
@@ -272,18 +273,16 @@ export function HostPage() {
 
       {/* --------------------------------------------------- keywords ---- */}
       <div className="mg-card">
-        <div className="text-title-2">Locations mentioned</div>
+        <div className="text-title-2">Mentioned</div>
         {state.keywords.length === 0 ? (
           <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
             {state.transcribe
               ? "Listening — nothing captured yet."
-              : "Turn on stage transcription to capture locations."}
+              : "Turn on stage transcription to capture locations and professions."}
           </p>
         ) : (
-          <div className="row row--wrap" style={{ marginTop: "var(--space-3)", gap: "var(--space-2)" }}>
-            {state.keywords.map((k) => (
-              <span key={k} className="mg-tag">{k}</span>
-            ))}
+          <div style={{ marginTop: "var(--space-3)" }}>
+            <Keywords keywords={state.keywords} />
           </div>
         )}
       </div>

@@ -14,6 +14,8 @@ import {
 export interface StoredShow {
   state: ShowState;
   hostToken: string;
+  /** Full transcript, appended server-side, never broadcast to viewers. */
+  transcript: string;
 }
 
 /** Raised for rule violations; the message is safe to show to the host. */
@@ -41,6 +43,7 @@ export function createShow(name: string): StoredShow {
       keywords: [],
     },
     hostToken: randomId(26),
+    transcript: "",
   };
 }
 

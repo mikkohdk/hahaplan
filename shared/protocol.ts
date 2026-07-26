@@ -61,6 +61,14 @@ export type Clock = z.infer<typeof ClockSchema>;
 
 /* ---------------------------------------------------------------- show -- */
 
+/* ------------------------------------------------------------ keywords -- */
+
+export const KeywordSchema = z.object({
+  term: z.string().min(1).max(60),
+  category: z.enum(["location", "profession"]),
+});
+export type Keyword = z.infer<typeof KeywordSchema>;
+
 export const ShowStateSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -70,8 +78,8 @@ export const ShowStateSchema = z.object({
   clock: ClockSchema,
   /** Host-controlled: whether the stage client should be transcribing (P1 spike). */
   transcribe: z.boolean().default(false),
-  /** Deduped location names mentioned so far (P1 insight). */
-  keywords: z.array(z.string()).default([]),
+  /** Deduped location/profession keywords mentioned so far (P1 insight). */
+  keywords: z.array(KeywordSchema).default([]),
 });
 export type ShowState = z.infer<typeof ShowStateSchema>;
 
@@ -98,8 +106,11 @@ export const ClientMessageSchema = z.discriminatedUnion("type", [
    * tokenless by design; this is data ingestion, not show control). */
   z.object({
     type: z.literal("keywords"),
-    keywords: z.array(z.string().min(1).max(60)).max(50),
+    keywords: z.array(KeywordSchema).max(50),
   }),
+  /** Transcript delta from the stage, appended server-side (never broadcast).
+   * Stored for optional offline analysis; not shown to viewers. */
+  z.object({ type: z.literal("transcript"), text: z.string().max(4000) }),
 ]);
 export type ClientMessage = z.infer<typeof ClientMessageSchema>;
 

@@ -21,20 +21,31 @@ export class ShowRepo {
         id         TEXT PRIMARY KEY,
         host_token TEXT NOT NULL,
         json       TEXT NOT NULL,
+        transcript TEXT NOT NULL DEFAULT '',
         updated_at INTEGER NOT NULL
       )
     `);
+    // Migrate older DBs that predate the transcript column.
+    try {
+      this.db.exec("ALTER TABLE shows ADD COLUMN transcript TEXT NOT NULL DEFAULT ''");
+    } catch {
+      // Column already exists — fine.
+    }
   }
 
   loadAll(): StoredShow[] {
     const rows = this.db
-      .prepare("SELECT host_token, json FROM shows")
-      .all() as Array<{ host_token: string; json: string }>;
+      .prepare("SELECT host_token, json, transcript FROM shows")
+      .all() as Array<{ host_token: string; json: string; transcript: string }>;
     const shows: StoredShow[] = [];
     for (const row of rows) {
       const parsed = ShowStateSchema.safeParse(JSON.parse(row.json));
       if (parsed.success) {
-        shows.push({ state: parsed.data, hostToken: row.host_token });
+        shows.push({
+          state: parsed.data,
+          hostToken: row.host_token,
+          transcript: row.transcript ?? "",
+        });
       } else {
         console.warn("Skipping corrupt show row:", parsed.error.message);
       }
@@ -45,10 +56,19 @@ export class ShowRepo {
   save(show: StoredShow): void {
     this.db
       .prepare(`
-        INSERT INTO shows (id, host_token, json, updated_at)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT(id) DO UPDATE SET json = excluded.json, updated_at = excluded.updated_at
+        INSERT INTO shows (id, host_token, json, transcript, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          json = excluded.json,
+          transcript = excluded.transcript,
+          updated_at = excluded.updated_at
       `)
-      .run(show.state.id, show.hostToken, JSON.stringify(show.state), Date.now());
+      .run(
+        show.state.id,
+        show.hostToken,
+        JSON.stringify(show.state),
+        show.transcript,
+        Date.now(),
+      );
   }
 }
