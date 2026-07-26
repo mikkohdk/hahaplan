@@ -1,6 +1,7 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 import { elapsedMs, formatClock, remainingMs } from "../../../shared/protocol";
+import { extractLocations } from "../lib/gazetteer";
 import { useShow, useTick } from "../lib/useShow";
 import { useTranscription } from "../lib/useTranscription";
 
@@ -14,7 +15,7 @@ import { useTranscription } from "../lib/useTranscription";
  */
 export function StagePage() {
   const { showId = "" } = useParams();
-  const { state, connected, notFound, serverNow } = useShow(showId);
+  const { state, connected, notFound, sendKeywords, serverNow } = useShow(showId);
   useTick(100);
 
   const {
@@ -35,6 +36,18 @@ export function StagePage() {
       setArmed(false);
     }
   }, [transcribeOn, armed, ccStop]);
+
+  // Pull location keywords out of the local transcript and send just those to
+  // the server (never the audio or full transcript). Each is sent once.
+  const sentKeywordsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!transcribeOn || !ccText) return;
+    const fresh = extractLocations(ccText).filter((k) => !sentKeywordsRef.current.has(k));
+    if (fresh.length) {
+      fresh.forEach((k) => sentKeywordsRef.current.add(k));
+      sendKeywords(fresh);
+    }
+  }, [ccText, transcribeOn, sendKeywords]);
 
   if (notFound) {
     return (

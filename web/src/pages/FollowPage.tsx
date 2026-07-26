@@ -74,6 +74,26 @@ export function FollowPage() {
       </div>
 
       <div className="mg-card">
+        <div className="text-title-2">Locations mentioned</div>
+        {state.keywords.length === 0 ? (
+          <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
+            Nothing yet.
+          </p>
+        ) : (
+          <>
+            <div className="row row--wrap" style={{ marginTop: "var(--space-3)", gap: "var(--space-2)" }}>
+              {state.keywords.map((k) => (
+                <span key={k} className="mg-tag">{k}</span>
+              ))}
+            </div>
+            <p className="text-caption text-muted" style={{ marginTop: "var(--space-3)" }}>
+              Just what was mentioned — ask the host who said it or why.
+            </p>
+          </>
+        )}
+      </div>
+
+      <div className="mg-card">
         <div className="text-title-2">Lineup</div>
         <ul className="lineup" style={{ marginTop: "var(--space-2)" }}>
           {state.acts.map((a) => {

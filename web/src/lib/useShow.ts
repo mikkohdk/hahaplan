@@ -72,10 +72,16 @@ export function useShow(showId: string) {
     wsRef.current?.send(JSON.stringify(msg));
   }, []);
 
+  const sendKeywords = useCallback((keywords: string[]) => {
+    if (keywords.length === 0) return;
+    const msg: ClientMessage = { type: "keywords", keywords };
+    wsRef.current?.send(JSON.stringify(msg));
+  }, []);
+
   /** Best estimate of the server's clock right now. */
   const serverNow = useCallback(() => Date.now() + offsetRef.current, []);
 
-  return { state, connected, notFound, lastError, sendAction, serverNow };
+  return { state, connected, notFound, lastError, sendAction, sendKeywords, serverNow };
 }
 
 /** Re-render on an interval so countdowns tick. */

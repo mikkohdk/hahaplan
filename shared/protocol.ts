@@ -70,6 +70,8 @@ export const ShowStateSchema = z.object({
   clock: ClockSchema,
   /** Host-controlled: whether the stage client should be transcribing (P1 spike). */
   transcribe: z.boolean().default(false),
+  /** Deduped location names mentioned so far (P1 insight). */
+  keywords: z.array(z.string()).default([]),
 });
 export type ShowState = z.infer<typeof ShowStateSchema>;
 
@@ -90,11 +92,15 @@ export const HostActionSchema = z.discriminatedUnion("type", [
 ]);
 export type HostAction = z.infer<typeof HostActionSchema>;
 
-export const ClientMessageSchema = z.object({
-  type: z.literal("action"),
-  token: z.string(),
-  action: HostActionSchema,
-});
+export const ClientMessageSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("action"), token: z.string(), action: HostActionSchema }),
+  /** Location keywords captured on the stage client (no token: stage URLs are
+   * tokenless by design; this is data ingestion, not show control). */
+  z.object({
+    type: z.literal("keywords"),
+    keywords: z.array(z.string().min(1).max(60)).max(50),
+  }),
+]);
 export type ClientMessage = z.infer<typeof ClientMessageSchema>;
 
 export type ServerMessage =

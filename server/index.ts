@@ -105,6 +105,20 @@ app.get("/ws/:showId", { websocket: true }, (socket: WebSocket, req) => {
       send(socket, { type: "error", message: "Malformed message." });
       return;
     }
+
+    if (msg.type === "keywords") {
+      // Data ingestion from the stage client — no token; merge deduped.
+      const before = show.state.keywords.length;
+      for (const kw of msg.keywords) {
+        if (!show.state.keywords.includes(kw)) show.state.keywords.push(kw);
+      }
+      if (show.state.keywords.length !== before) {
+        repo.save(show);
+        broadcast(showId, show.state);
+      }
+      return;
+    }
+
     if (msg.token !== show.hostToken) {
       send(socket, { type: "error", message: "Not authorized: bad host token." });
       return;

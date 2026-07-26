@@ -270,6 +270,24 @@ export function HostPage() {
         </button>
       </div>
 
+      {/* --------------------------------------------------- keywords ---- */}
+      <div className="mg-card">
+        <div className="text-title-2">Locations mentioned</div>
+        {state.keywords.length === 0 ? (
+          <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
+            {state.transcribe
+              ? "Listening — nothing captured yet."
+              : "Turn on stage transcription to capture locations."}
+          </p>
+        ) : (
+          <div className="row row--wrap" style={{ marginTop: "var(--space-3)", gap: "var(--space-2)" }}>
+            {state.keywords.map((k) => (
+              <span key={k} className="mg-tag">{k}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* ----------------------------------------------------- lineup ---- */}
       <div className="mg-card">
         <div className="text-title-2">Lineup</div>

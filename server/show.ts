@@ -38,6 +38,7 @@ export function createShow(name: string): StoredShow {
       doneActIds: [],
       clock: { status: "idle", segment: null, startedAtMs: null, accumulatedMs: 0 },
       transcribe: false,
+      keywords: [],
     },
     hostToken: randomId(26),
   };
