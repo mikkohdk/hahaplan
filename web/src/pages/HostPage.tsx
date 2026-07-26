@@ -8,6 +8,7 @@ import {
   formatClock,
   nextAct,
 } from "../../../shared/protocol";
+import { Keywords } from "../components/Keywords";
 import { claimHostToken } from "../lib/api";
 import { ChevronDown, ChevronUp, X } from "../lib/icons";
 import {
@@ -268,6 +269,22 @@ export function HostPage() {
         >
           {state.transcribe ? "◉ Stop transcription test" : "▶ Test transcription on stage"}
         </button>
+      </div>
+
+      {/* --------------------------------------------------- keywords ---- */}
+      <div className="mg-card">
+        <div className="text-title-2">Mentioned</div>
+        {state.keywords.length === 0 ? (
+          <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
+            {state.transcribe
+              ? "Listening — nothing captured yet."
+              : "Turn on stage transcription to capture locations and professions."}
+          </p>
+        ) : (
+          <div style={{ marginTop: "var(--space-3)" }}>
+            <Keywords keywords={state.keywords} />
+          </div>
+        )}
       </div>
 
       {/* ----------------------------------------------------- lineup ---- */}

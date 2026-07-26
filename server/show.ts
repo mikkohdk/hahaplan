@@ -14,6 +14,8 @@ import {
 export interface StoredShow {
   state: ShowState;
   hostToken: string;
+  /** Full transcript, appended server-side, never broadcast to viewers. */
+  transcript: string;
 }
 
 /** Raised for rule violations; the message is safe to show to the host. */
@@ -38,8 +40,10 @@ export function createShow(name: string): StoredShow {
       doneActIds: [],
       clock: { status: "idle", segment: null, startedAtMs: null, accumulatedMs: 0 },
       transcribe: false,
+      keywords: [],
     },
     hostToken: randomId(26),
+    transcript: "",
   };
 }
 

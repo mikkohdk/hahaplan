@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { elapsedMs, formatClock, nextAct } from "../../../shared/protocol";
+import { Keywords } from "../components/Keywords";
 import { useShow, useTick } from "../lib/useShow";
 
 /**
@@ -71,6 +72,24 @@ export function FollowPage() {
         <div className="text-caption" style={{ marginTop: "var(--space-2)" }}>
           {upNext ? `Up next: ${upNext.name}` : "Nobody up next"}
         </div>
+      </div>
+
+      <div className="mg-card">
+        <div className="text-title-2">Mentioned</div>
+        {state.keywords.length === 0 ? (
+          <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
+            Nothing yet.
+          </p>
+        ) : (
+          <>
+            <div style={{ marginTop: "var(--space-3)" }}>
+              <Keywords keywords={state.keywords} />
+            </div>
+            <p className="text-caption text-muted" style={{ marginTop: "var(--space-3)" }}>
+              Just what was mentioned — ask the host who said it or why.
+            </p>
+          </>
+        )}
       </div>
 
       <div className="mg-card">

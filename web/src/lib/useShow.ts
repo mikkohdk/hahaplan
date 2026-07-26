@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   ClientMessage,
   HostAction,
+  Keyword,
   ServerMessage,
   ShowState,
 } from "../../../shared/protocol";
@@ -72,10 +73,31 @@ export function useShow(showId: string) {
     wsRef.current?.send(JSON.stringify(msg));
   }, []);
 
+  const sendKeywords = useCallback((keywords: Keyword[]) => {
+    if (keywords.length === 0) return;
+    const msg: ClientMessage = { type: "keywords", keywords };
+    wsRef.current?.send(JSON.stringify(msg));
+  }, []);
+
+  const sendTranscript = useCallback((text: string) => {
+    if (!text) return;
+    const msg: ClientMessage = { type: "transcript", text };
+    wsRef.current?.send(JSON.stringify(msg));
+  }, []);
+
   /** Best estimate of the server's clock right now. */
   const serverNow = useCallback(() => Date.now() + offsetRef.current, []);
 
-  return { state, connected, notFound, lastError, sendAction, serverNow };
+  return {
+    state,
+    connected,
+    notFound,
+    lastError,
+    sendAction,
+    sendKeywords,
+    sendTranscript,
+    serverNow,
+  };
 }
 
 /** Re-render on an interval so countdowns tick. */

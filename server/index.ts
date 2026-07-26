@@ -84,6 +84,17 @@ app.get("/api/shows/:id", async (req, reply) => {
   return { state: show.state };
 });
 
+// Full transcript + captured keywords for offline analysis. Host-token gated so
+// it isn't public; the offline LLM gap-check reads this on the operator's command.
+app.get("/api/shows/:id/transcript", async (req, reply) => {
+  const { id } = req.params as { id: string };
+  const { token } = req.query as { token?: string };
+  const show = shows.get(id);
+  if (!show) return reply.code(404).send({ error: "Show not found." });
+  if (token !== show.hostToken) return reply.code(403).send({ error: "Bad host token." });
+  return { id, transcript: show.transcript, keywords: show.state.keywords };
+});
+
 app.get("/ws/:showId", { websocket: true }, (socket: WebSocket, req) => {
   const { showId } = req.params as { showId: string };
   const show = shows.get(showId);
@@ -105,6 +116,32 @@ app.get("/ws/:showId", { websocket: true }, (socket: WebSocket, req) => {
       send(socket, { type: "error", message: "Malformed message." });
       return;
     }
+
+    if (msg.type === "keywords") {
+      // Data ingestion from the stage client — no token; merge deduped by
+      // term + category.
+      const before = show.state.keywords.length;
+      for (const kw of msg.keywords) {
+        const exists = show.state.keywords.some(
+          (k) => k.term === kw.term && k.category === kw.category,
+        );
+        if (!exists) show.state.keywords.push(kw);
+      }
+      if (show.state.keywords.length !== before) {
+        repo.save(show);
+        broadcast(showId, show.state);
+      }
+      return;
+    }
+
+    if (msg.type === "transcript") {
+      // Append to the stored transcript. Never broadcast — it's for optional
+      // offline analysis, retrieved with the host token.
+      show.transcript += (show.transcript ? " " : "") + msg.text;
+      repo.save(show);
+      return;
+    }
+
     if (msg.token !== show.hostToken) {
       send(socket, { type: "error", message: "Not authorized: bad host token." });
       return;

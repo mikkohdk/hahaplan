@@ -1,6 +1,7 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 import { elapsedMs, formatClock, remainingMs } from "../../../shared/protocol";
+import { extractKeywords } from "../lib/gazetteer";
 import { useShow, useTick } from "../lib/useShow";
 import { useTranscription } from "../lib/useTranscription";
 
@@ -14,7 +15,8 @@ import { useTranscription } from "../lib/useTranscription";
  */
 export function StagePage() {
   const { showId = "" } = useParams();
-  const { state, connected, notFound, serverNow } = useShow(showId);
+  const { state, connected, notFound, sendKeywords, sendTranscript, serverNow } =
+    useShow(showId);
   useTick(100);
 
   const {
@@ -35,6 +37,32 @@ export function StagePage() {
       setArmed(false);
     }
   }, [transcribeOn, armed, ccStop]);
+
+  // Pull location/profession keywords out of the local transcript and send just
+  // those (each once). Audio never leaves; keyword capture is always on.
+  const sentKeywordsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!transcribeOn || !ccText) return;
+    const fresh = extractKeywords(ccText).filter(
+      (k) => !sentKeywordsRef.current.has(`${k.category}:${k.term}`),
+    );
+    if (fresh.length) {
+      fresh.forEach((k) => sentKeywordsRef.current.add(`${k.category}:${k.term}`));
+      sendKeywords(fresh);
+    }
+  }, [ccText, transcribeOn, sendKeywords]);
+
+  // Write the transcript back to the server (stored, not broadcast) so it can be
+  // pulled later for offline keyword-gap analysis. Send only the new suffix.
+  const sentLenRef = useRef(0);
+  useEffect(() => {
+    if (!transcribeOn) return;
+    if (ccText.length < sentLenRef.current) sentLenRef.current = 0; // transcript reset
+    if (ccText.length > sentLenRef.current) {
+      sendTranscript(ccText.slice(sentLenRef.current));
+      sentLenRef.current = ccText.length;
+    }
+  }, [ccText, transcribeOn, sendTranscript]);
 
   if (notFound) {
     return (
