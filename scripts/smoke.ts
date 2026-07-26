@@ -175,6 +175,25 @@ async function main() {
   await viewer.nextState();
   assert(s.clock.status === "ended", "no acts left → show ended");
 
+  // -- restart: back to idle, same lineup, done acts + mentions cleared -----
+  host.send(hostToken, { type: "restart" });
+  s = await host.nextState();
+  await viewer.nextState();
+  assert(s.clock.status === "idle" && s.clock.segment === null, "restart → idle");
+  assert(s.doneActIds.length === 0, "restart clears done acts");
+  assert(s.acts.length === 1, "restart keeps the lineup");
+  assert(s.keywords.length === 0, "restart clears captured mentions");
+
+  // -- start again after restart, then stop mid-show -----------------------
+  host.send(hostToken, { type: "start" });
+  s = await host.nextState();
+  await viewer.nextState();
+  assert(s.clock.status === "running", "start after restart runs again");
+  host.send(hostToken, { type: "stop" });
+  s = await host.nextState();
+  await viewer.nextState();
+  assert(s.clock.status === "ended", "stop ends the show");
+
   // -- REST state matches -----------------------------------------------------
   const getRes = await fetch(`${BASE}/api/shows/${created.id}`);
   const { state: fetched } = (await getRes.json()) as { state: ShowState };

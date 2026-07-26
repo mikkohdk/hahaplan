@@ -157,6 +157,23 @@ export function applyAction(
       state.clock.startedAtMs = now;
       return;
     }
+    case "stop": {
+      if (state.clock.status === "idle") {
+        throw new ShowError("The show hasn't started.");
+      }
+      if (state.clock.status === "ended") return; // already over — no-op
+      finishCurrent(state);
+      state.clock = { status: "ended", segment: null, startedAtMs: null, accumulatedMs: 0 };
+      return;
+    }
+    case "restart": {
+      // Back to a fresh idle show with the same lineup: nothing on stage, no acts
+      // marked done, and the captured mentions cleared for a clean run.
+      state.clock = { status: "idle", segment: null, startedAtMs: null, accumulatedMs: 0 };
+      state.doneActIds = [];
+      state.keywords = [];
+      return;
+    }
     case "setActs": {
       const ids = new Set(action.acts.map((a) => a.id));
       if (ids.size !== action.acts.length) {

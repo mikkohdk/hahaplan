@@ -237,16 +237,27 @@ export function HostPage() {
             )}
           </div>
         </div>
-        <div className="controls" style={{ marginTop: "var(--space-4)" }}>
+        {/* Next is the primary, always-there action — big and dominant. Start,
+            Pause/Resume, Stop and Restart are the smaller supporting controls. */}
+        <button
+          className="mg-btn mg-btn--accent mg-btn--block"
+          onClick={() => act({ type: "next" })}
+          style={{
+            marginTop: "var(--space-4)",
+            fontSize: "1.5rem",
+            minHeight: "4rem",
+            fontWeight: 700,
+          }}
+        >
+          Next
+        </button>
+        <div className="controls" style={{ marginTop: "var(--space-3)" }}>
           <button
-            className="mg-btn mg-btn--primary mg-btn--lg"
+            className="mg-btn mg-btn--secondary"
             onClick={() => act({ type: "start" })}
             disabled={seg?.kind === "act"}
           >
             Start
-          </button>
-          <button className="mg-btn mg-btn--accent mg-btn--lg" onClick={() => act({ type: "next" })}>
-            Next
           </button>
           {clock.status === "paused" ? (
             <button className="mg-btn mg-btn--secondary" onClick={() => act({ type: "resume" })}>
@@ -261,6 +272,24 @@ export function HostPage() {
               Pause
             </button>
           )}
+          <button
+            className="mg-btn mg-btn--secondary"
+            onClick={() => window.confirm("End the show now?") && act({ type: "stop" })}
+            disabled={clock.status === "idle" || clock.status === "ended"}
+          >
+            Stop
+          </button>
+          <button
+            className="mg-btn mg-btn--ghost"
+            onClick={() =>
+              window.confirm(
+                "Restart the show from the beginning? This clears the running order and captured mentions.",
+              ) && act({ type: "restart" })
+            }
+            disabled={clock.status === "idle"}
+          >
+            Restart
+          </button>
         </div>
       </div>
 
