@@ -95,28 +95,26 @@ export function StagePage() {
         {!connected && " · reconnecting"}
       </div>
 
-      {transcribeOn && (
+      {transcribeOn && !armed && (
+        <button
+          className="stage__cc-arm"
+          onClick={async () => {
+            setArmed(true);
+            await ccStart();
+          }}
+        >
+          ▶ Tap to start transcription
+        </button>
+      )}
+      {transcribeOn && armed && (
         <div className="stage__cc">
-          {!armed ? (
-            <button
-              className="stage__cc-btn"
-              onClick={async () => {
-                setArmed(true);
-                await ccStart();
-              }}
-            >
-              Tap to enable transcription
-            </button>
-          ) : (
-            <>
-              <div className="stage__cc-status">
-                {ccStatus === "loading" && "loading model…"}
-                {ccStatus === "listening" && "● transcribing"}
-                {ccStatus === "error" && `error: ${ccError ?? ""}`}
-              </div>
-              <div className="stage__cc-text">{ccText || "…"}</div>
-            </>
-          )}
+          <div className="stage__cc-status">
+            {ccStatus === "idle" && "starting…"}
+            {ccStatus === "loading" && "loading model…"}
+            {ccStatus === "listening" && "● transcribing"}
+            {ccStatus === "error" && `error: ${ccError ?? ""}`}
+          </div>
+          <div className="stage__cc-text">{ccText || "…"}</div>
         </div>
       )}
     </div>
