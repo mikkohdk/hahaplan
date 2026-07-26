@@ -262,13 +262,6 @@ export function HostPage() {
             </button>
           )}
         </div>
-        <button
-          className={`mg-btn mg-btn--block ${state.transcribe ? "mg-btn--danger" : "mg-btn--secondary"}`}
-          style={{ marginTop: "var(--space-4)" }}
-          onClick={() => act({ type: "setTranscribe", on: !state.transcribe })}
-        >
-          {state.transcribe ? "◉ Stop transcription test" : "▶ Test transcription on stage"}
-        </button>
       </div>
 
       {/* --------------------------------------------------- keywords ---- */}
@@ -277,8 +270,8 @@ export function HostPage() {
         {state.keywords.length === 0 ? (
           <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
             {state.transcribe
-              ? "Listening — nothing captured yet."
-              : "Turn on stage transcription to capture locations and professions."}
+              ? "Listening on the stage — nothing captured yet."
+              : "Capture is off. Tick the consent box under the lineup to note the locations and professions performers mention."}
           </p>
         ) : (
           <div style={{ marginTop: "var(--space-3)" }}>
@@ -359,6 +352,37 @@ export function HostPage() {
             Add break
           </button>
         </div>
+
+        <label
+          className="consent-box"
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "var(--space-3)",
+            marginTop: "var(--space-4)",
+            paddingTop: "var(--space-4)",
+            borderTop: "1px solid var(--border-subtle)",
+            cursor: "pointer",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={state.transcribe}
+            onChange={(e) => act({ type: "setTranscribe", on: e.target.checked })}
+            style={{ marginTop: "0.15rem", width: "1.15rem", height: "1.15rem", flexShrink: 0 }}
+          />
+          <span>
+            <span className="text-body">Capture locations &amp; professions from the stage</span>
+            <span
+              className="text-caption text-muted"
+              style={{ display: "block", marginTop: "var(--space-1)" }}
+            >
+              With your consent, the stage screen transcribes each performer to note the
+              places and jobs they mention. Audio is never recorded — only the matched
+              words. The stage asks for microphone access once, at setup.
+            </span>
+          </span>
+        </label>
       </div>
 
       {/* -------------------------------------------------- templates ---- */}
