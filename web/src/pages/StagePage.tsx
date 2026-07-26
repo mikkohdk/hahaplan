@@ -21,6 +21,7 @@ export function StagePage() {
     status: ccStatus,
     text: ccText,
     error: ccError,
+    device: ccDevice,
     start: ccStart,
     stop: ccStop,
   } = useTranscription();
@@ -111,10 +112,12 @@ export function StagePage() {
           <div className="stage__cc-status">
             {ccStatus === "idle" && "starting…"}
             {ccStatus === "loading" && "loading model…"}
-            {ccStatus === "listening" && "● transcribing"}
-            {ccStatus === "error" && `error: ${ccError ?? ""}`}
+            {ccStatus === "listening" && `● transcribing${ccDevice ? ` · ${ccDevice}` : ""}`}
+            {ccStatus === "error" && "error"}
           </div>
-          <div className="stage__cc-text">{ccText || "…"}</div>
+          <div className="stage__cc-text">
+            {ccStatus === "error" ? `⚠ ${ccError ?? "unknown error"}` : ccText || "…"}
+          </div>
         </div>
       )}
     </div>

@@ -32,6 +32,7 @@ export function useTranscription() {
   const [status, setStatus] = useState<TranscribeStatus>("idle");
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [device, setDevice] = useState<string | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
@@ -70,8 +71,13 @@ export function useTranscription() {
       workerRef.current = worker;
       worker.onmessage = (e) => {
         const m = e.data;
-        if (m.type === "text" && m.text) {
+        if (m.type === "status" && m.status === "ready") {
+          setDevice(m.device ?? null);
+          setStatus((s) => (s === "error" ? s : "listening"));
+        } else if (m.type === "text" && m.text) {
           setText((prev) => (prev ? `${prev} ${m.text}` : m.text));
+          setError(null);
+          setStatus("listening"); // a good chunk means we've recovered
         } else if (m.type === "error") {
           setError(m.message);
           setStatus("error");
@@ -124,5 +130,5 @@ export function useTranscription() {
   // Tear everything down if the component unmounts mid-capture.
   useEffect(() => stop, [stop]);
 
-  return { status, text, error, start, stop };
+  return { status, text, error, device, start, stop };
 }
