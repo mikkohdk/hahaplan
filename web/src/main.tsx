@@ -7,6 +7,7 @@ import { Landing } from "./pages/Landing";
 import { HostPage } from "./pages/HostPage";
 import { StagePage } from "./pages/StagePage";
 import { FollowPage } from "./pages/FollowPage";
+import { CheckPage } from "./pages/CheckPage";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/show/:showId/host" element={<HostPage />} />
         <Route path="/show/:showId/stage" element={<StagePage />} />
         <Route path="/show/:showId/follow" element={<FollowPage />} />
+        <Route path="/check" element={<CheckPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

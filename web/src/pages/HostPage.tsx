@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import QRCode from "qrcode";
 import {
@@ -28,6 +28,47 @@ function useQr(url: string): string | null {
 }
 
 const clampMinutes = (n: number) => Math.min(240, Math.max(1, Math.round(n || 1)));
+
+/**
+ * Per-act minutes field. Controlled so the spinner arrows commit (not just
+ * blur), debounced so typing multi-digit numbers isn't cut off, and synced to
+ * the act's real duration when it changes elsewhere.
+ */
+function MinutesField({
+  minutes,
+  onCommit,
+}: {
+  minutes: number;
+  onCommit: (m: number) => void;
+}) {
+  const [val, setVal] = useState(String(minutes));
+  const timer = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    setVal(String(minutes));
+  }, [minutes]);
+
+  const change = (raw: string) => {
+    setVal(raw);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => onCommit(clampMinutes(Number(raw))), 400);
+  };
+
+  return (
+    <input
+      className="mg-input"
+      type="number"
+      min={1}
+      max={240}
+      value={val}
+      onChange={(e) => change(e.target.value)}
+      onBlur={() => {
+        window.clearTimeout(timer.current);
+        onCommit(clampMinutes(Number(val)));
+      }}
+    />
+  );
+}
 
 export function HostPage() {
   const { showId = "" } = useParams();
@@ -94,9 +135,19 @@ export function HostPage() {
   const seg = clock.segment;
   const upNext = nextAct(state);
 
+  function nextActName(): string {
+    // Auto-name unnamed performers "Act N" using the next unused number, so it
+    // doesn't collide if some acts were renamed or deleted.
+    const used = state!.acts
+      .map((a) => /^Act (\d+)$/.exec(a.name)?.[1])
+      .filter((n): n is string => n != null)
+      .map(Number);
+    return `Act ${(used.length ? Math.max(...used) : 0) + 1}`;
+  }
+
   function addAct(kind: Act["kind"]) {
-    const name = kind === "break" ? "Break" : newName.trim();
-    if (!name) return;
+    const name =
+      kind === "break" ? "Break" : newName.trim() || nextActName();
     setActs([
       ...state!.acts,
       {
@@ -245,15 +296,10 @@ export function HostPage() {
                   )}
                 </span>
                 <label className="act-field" title="Set length in minutes">
-                  <input
-                    key={`min-${a.id}-${a.durationSec}`}
-                    className="mg-input"
-                    type="number"
-                    min={1}
-                    max={240}
-                    defaultValue={Math.round(a.durationSec / 60)}
-                    onBlur={(e) => {
-                      const sec = clampMinutes(Number(e.target.value)) * 60;
+                  <MinutesField
+                    minutes={Math.round(a.durationSec / 60)}
+                    onCommit={(m) => {
+                      const sec = m * 60;
                       if (sec !== a.durationSec) updateAct(a.id, { durationSec: sec });
                     }}
                   />

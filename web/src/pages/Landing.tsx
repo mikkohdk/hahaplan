@@ -62,6 +62,10 @@ export function Landing() {
       <p className="text-caption">
         Got a stage or follow link from a host? Just open it — no account, no app.
       </p>
+      <p className="text-caption">
+        Curious about the live transcription?{" "}
+        <a href="/check">See if your device can run it →</a>
+      </p>
     </div>
   );
 }
