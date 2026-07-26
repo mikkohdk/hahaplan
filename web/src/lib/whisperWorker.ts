@@ -18,9 +18,11 @@ if (env.backends?.onnx?.wasm) {
   env.backends.onnx.wasm.numThreads = 1;
 }
 
-// Tiny English model: smallest download (~40 MB) and fastest — enough to prove
-// feasibility on the stage device. Swap for whisper-base if accuracy is short.
-const MODEL = "Xenova/whisper-tiny.en";
+// Base English model (~74 MB). small.en is more accurate but too slow to keep
+// up in real time on a typical stage GPU (it lags ~a minute behind); base.en
+// stays a few seconds behind while still being far better than tiny at proper
+// nouns (place names). This is the practical real-time ceiling in-browser.
+const MODEL = "Xenova/whisper-base.en";
 
 const ctx = self as unknown as {
   postMessage: (msg: unknown) => void;
@@ -92,27 +94,36 @@ ctx.onmessage = (e: MessageEvent) => {
     queue = queue.then(async () => {
       const audio = msg.audio as Float32Array;
       try {
-        const t = await getTranscriber();
-        const out = await t(audio);
-        emit(out);
-      } catch (err) {
-        // WebGPU can load but fail at inference on some devices/models — drop to
-        // WASM for the rest of the session and retry this chunk once.
-        if (mode === "webgpu") {
-          try {
+        try {
+          const t = await getTranscriber();
+          const t0 = performance.now();
+          const out = await t(audio);
+          // If inference ms exceeds the audio's seconds, we're slower than
+          // real time and will fall behind. Visible in the stage tab console.
+          console.log(
+            `[whisper] ${mode}: ${(performance.now() - t0).toFixed(0)}ms for ` +
+              `${(audio.length / 16000).toFixed(1)}s of audio`,
+          );
+          emit(out);
+        } catch (err) {
+          // WebGPU can load but fail at inference on some devices/models — drop
+          // to WASM for the rest of the session and retry this chunk once.
+          if (mode === "webgpu") {
             transcriber = null;
             loading = null;
             transcriber = await build("wasm");
             mode = "wasm";
             ctx.postMessage({ type: "status", status: "ready", device: mode });
             emit(await transcriber(audio));
-            return;
-          } catch (err2) {
-            ctx.postMessage({ type: "error", message: `wasm: ${errText(err2)}` });
-            return;
+          } else {
+            ctx.postMessage({ type: "error", message: errText(err) });
           }
         }
-        ctx.postMessage({ type: "error", message: errText(err) });
+      } catch (err2) {
+        ctx.postMessage({ type: "error", message: `wasm: ${errText(err2)}` });
+      } finally {
+        // Ack so the client knows the worker is free (backpressure).
+        ctx.postMessage({ type: "done" });
       }
     });
   }

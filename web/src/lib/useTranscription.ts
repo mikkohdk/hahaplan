@@ -40,11 +40,13 @@ export function useTranscription() {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const bufRef = useRef<Float32Array[]>([]);
   const flushRef = useRef<number | undefined>(undefined);
+  const busyRef = useRef(false);
 
   const stop = useCallback(() => {
     window.clearInterval(flushRef.current);
     flushRef.current = undefined;
     bufRef.current = [];
+    busyRef.current = false;
     if (processorRef.current) {
       processorRef.current.onaudioprocess = null;
       processorRef.current.disconnect();
@@ -78,6 +80,8 @@ export function useTranscription() {
           setText((prev) => (prev ? `${prev} ${m.text}` : m.text));
           setError(null);
           setStatus("listening"); // a good chunk means we've recovered
+        } else if (m.type === "done") {
+          busyRef.current = false;
         } else if (m.type === "error") {
           setError(m.message);
           setStatus("error");
@@ -107,18 +111,31 @@ export function useTranscription() {
       setStatus((s) => (s === "error" ? s : "listening"));
 
       flushRef.current = window.setInterval(() => {
+        // Still processing the previous window: leave audio accumulating in
+        // bufRef (do NOT discard it) and try again next tick.
+        if (busyRef.current) return;
         const chunks = bufRef.current;
         if (chunks.length === 0) return;
         bufRef.current = [];
         let total = 0;
         for (const c of chunks) total += c.length;
-        const merged = new Float32Array(total);
+        let merged = new Float32Array(total);
         let off = 0;
         for (const c of chunks) {
           merged.set(c, off);
           off += c.length;
         }
+        // If we fell behind, keep only the last ~20s so we stay inside Whisper's
+        // 30s window instead of sending an ever-growing clip.
+        const maxLen = 20 * audioCtx.sampleRate;
+        if (merged.length > maxLen) merged = merged.slice(merged.length - maxLen);
+        // Skip a window only if it's essentially silent — blocks hallucination on
+        // dead air without eating real (even quiet) speech.
+        let sumSq = 0;
+        for (let i = 0; i < merged.length; i++) sumSq += merged[i]! * merged[i]!;
+        if (Math.sqrt(sumSq / merged.length) < 0.0025) return;
         const audio = resample(merged, audioCtx.sampleRate, TARGET_RATE);
+        busyRef.current = true;
         workerRef.current?.postMessage({ type: "audio", audio }, [audio.buffer]);
       }, FLUSH_MS);
     } catch (err) {
