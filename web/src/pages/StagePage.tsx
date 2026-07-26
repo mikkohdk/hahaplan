@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 import { elapsedMs, formatClock, remainingMs } from "../../../shared/protocol";
+import { Keywords } from "../components/Keywords";
 import { extractKeywords } from "../lib/gazetteer";
 import { useShow, useTick } from "../lib/useShow";
 import { useTranscription } from "../lib/useTranscription";
@@ -132,7 +133,7 @@ export function StagePage() {
             await ccStart();
           }}
         >
-          ▶ Tap to start transcription
+          ▶ Tap once to start · grants mic access
         </button>
       )}
       {transcribeOn && armed && (
@@ -140,12 +141,18 @@ export function StagePage() {
           <div className="stage__cc-status">
             {ccStatus === "idle" && "starting…"}
             {ccStatus === "loading" && "loading model…"}
-            {ccStatus === "listening" && `● transcribing${ccDevice ? ` · ${ccDevice}` : ""}`}
+            {ccStatus === "listening" && `● listening${ccDevice ? ` · ${ccDevice}` : ""}`}
             {ccStatus === "error" && "error"}
           </div>
-          <div className="stage__cc-text">
-            {ccStatus === "error" ? `⚠ ${ccError ?? "unknown error"}` : ccText || "…"}
-          </div>
+          {/* Show the captured keywords (what the host sees too), not the raw
+              transcript — the stage faces the performer. */}
+          {ccStatus === "error" ? (
+            <div className="stage__cc-text">⚠ {ccError ?? "unknown error"}</div>
+          ) : state.keywords.length > 0 ? (
+            <Keywords keywords={state.keywords} />
+          ) : (
+            <div className="stage__cc-text">listening…</div>
+          )}
         </div>
       )}
     </div>
