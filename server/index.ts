@@ -25,6 +25,7 @@ import {
   createShow,
   type StoredShow,
 } from "./show";
+import { putTranscript, transcriptStorageEnabled } from "./storage";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT ?? 8787);
@@ -55,6 +56,41 @@ function broadcast(showId: string, state: ShowState): void {
   if (!room) return;
   const msg = stateMessage(state);
   for (const socket of room) send(socket, msg);
+}
+
+/* ----------------------------------------------- transcript archiving -- */
+
+// Push the full transcript to durable external storage (see storage.ts). Uploads
+// are debounced while it grows, then flushed immediately when the show ends, so
+// the archive survives Render's ephemeral disk with at most one in-flight window
+// of loss. Keyed by show name + creation time; each upload overwrites the same
+// object, so this is cheap even on a chatty stage.
+const UPLOAD_DEBOUNCE_MS = 20_000;
+const uploadTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function flushTranscript(show: StoredShow): void {
+  putTranscript(show.state.name, show.state.createdAtMs, show.transcript).catch((err) =>
+    console.error(`Transcript upload failed for ${show.state.id}:`, err.message),
+  );
+}
+
+function scheduleTranscriptUpload(show: StoredShow, immediate = false): void {
+  if (!transcriptStorageEnabled() || !show.transcript) return;
+  const id = show.state.id;
+  const pending = uploadTimers.get(id);
+  if (pending) clearTimeout(pending);
+  if (immediate) {
+    uploadTimers.delete(id);
+    flushTranscript(show);
+    return;
+  }
+  uploadTimers.set(
+    id,
+    setTimeout(() => {
+      uploadTimers.delete(id);
+      flushTranscript(show);
+    }, UPLOAD_DEBOUNCE_MS).unref(),
+  );
 }
 
 /* ------------------------------------------------------------------ app -- */
@@ -139,6 +175,7 @@ app.get("/ws/:showId", { websocket: true }, (socket: WebSocket, req) => {
       // offline analysis, retrieved with the host token.
       show.transcript += (show.transcript ? " " : "") + msg.text;
       repo.save(show);
+      scheduleTranscriptUpload(show);
       return;
     }
 
@@ -155,6 +192,9 @@ app.get("/ws/:showId", { websocket: true }, (socket: WebSocket, req) => {
     }
     repo.save(show);
     broadcast(showId, show.state);
+    // The show just ended (via Next past the last act / End) — archive now
+    // rather than waiting out the debounce window.
+    if (show.state.clock.status === "ended") scheduleTranscriptUpload(show, true);
   });
 
   socket.on("close", () => {
@@ -178,6 +218,7 @@ setInterval(() => {
     if (autoEndIfAbandoned(show.state, now)) {
       repo.save(show);
       broadcast(show.state.id, show.state);
+      scheduleTranscriptUpload(show, true);
       console.log(`Auto-ended abandoned show ${show.state.id}`);
     }
   }

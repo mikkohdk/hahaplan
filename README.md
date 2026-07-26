@@ -66,6 +66,28 @@ shows across restarts, use a paid instance with a persistent disk mounted at
 `/app/data`. CI (`.github/workflows/ci.yml`) type-checks, builds, and runs the
 end-to-end smoke test on every push and PR.
 
+### Transcript archive (optional)
+
+Because the free-tier disk is ephemeral, transcripts can also be pushed to an
+S3-compatible bucket (Supabase Storage, Cloudflare R2, Backblaze B2, or AWS S3),
+keyed by show name + timestamp — e.g.
+`transcripts/tuesday-night-open-mic-2026-07-26T20-15-00-000Z.txt`. This is the
+raw data a separate offline data-quality / keyword-gap tool reads later; the
+running app never reads it back. Uploads are debounced while a show is live and
+flushed when it ends. Leave the env vars unset and it's a silent no-op.
+
+Set these on the web service (for **Supabase Storage**: create a bucket, then
+Project → Storage → S3 Connection for the endpoint + region, and generate S3
+access keys under Storage settings):
+
+```
+S3_ENDPOINT           https://<ref>.supabase.co/storage/v1/s3
+S3_BUCKET             transcripts
+S3_ACCESS_KEY_ID      <s3 access key id>
+S3_SECRET_ACCESS_KEY  <s3 secret access key>
+S3_REGION             <project region, e.g. eu-central-1>
+```
+
 ## Layout
 
 ```
