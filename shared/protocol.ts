@@ -92,6 +92,10 @@ export const HostActionSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("next") }),
   z.object({ type: z.literal("pause") }),
   z.object({ type: z.literal("resume") }),
+  /** End the show now, whatever is on stage (as if Next past the last act). */
+  z.object({ type: z.literal("stop") }),
+  /** Reset the show to idle with the same lineup, so it can be run again. */
+  z.object({ type: z.literal("restart") }),
   /** Replace the whole lineup (add / delete / reorder are all just this). */
   z.object({ type: z.literal("setActs"), acts: z.array(ActSchema).max(100) }),
   z.object({ type: z.literal("setName"), name: z.string().min(1).max(120) }),
