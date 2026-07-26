@@ -68,6 +68,8 @@ export const ShowStateSchema = z.object({
   acts: z.array(ActSchema),
   doneActIds: z.array(z.string()),
   clock: ClockSchema,
+  /** Host-controlled: whether the stage client should be transcribing (P1 spike). */
+  transcribe: z.boolean().default(false),
 });
 export type ShowState = z.infer<typeof ShowStateSchema>;
 
@@ -83,6 +85,8 @@ export const HostActionSchema = z.discriminatedUnion("type", [
   /** Replace the whole lineup (add / delete / reorder are all just this). */
   z.object({ type: z.literal("setActs"), acts: z.array(ActSchema).max(100) }),
   z.object({ type: z.literal("setName"), name: z.string().min(1).max(120) }),
+  /** Turn stage-client transcription on/off (P1 spike). */
+  z.object({ type: z.literal("setTranscribe"), on: z.boolean() }),
 ]);
 export type HostAction = z.infer<typeof HostActionSchema>;
 

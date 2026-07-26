@@ -20,6 +20,9 @@ gets swapped in when exported).
   up the longer an act runs over
 - ✅ Host Plan tab: add / reorder (↑ ↓) / delete acts and breaks, edit an act's
   length inline, live editing during a show
+- 🧪 **P1.1 spike** — stage-client in-browser Whisper (transformers.js, WebGPU/WASM,
+  audio never leaves the device); host-toggled, transcript shown on the stage only
+  to isolate feasibility before wiring tracks/insights
 - ⏭ **P0.2** — remaining: drag-and-drop reorder, three-tab host layout
 
 ## Run it
