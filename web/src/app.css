@@ -144,42 +144,50 @@
 
 /* Live transcription strip (P1 spike): pinned along the bottom so it never
    covers the giant clock. */
+/* Full-screen gate: browsers only grant the mic on a user gesture, so this
+   unmissable overlay is the one tap needed to start. */
+.stage__cc-arm {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: min(6vw, 8vh);
+}
+
 .stage__cc {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 2vh 5vw;
+  z-index: 5;
+  padding: 2.5vh 5vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1vh;
   font-family: var(--font-mono);
   text-align: center;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
-}
-.stage__cc-btn {
-  padding: 1.4vh 4vw;
-  font-family: var(--font-mono);
-  font-size: min(3vw, 3vh);
-  color: #000;
-  background: #fff;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
+  color: #fff; /* always readable, whatever colour the stage is */
+  background: rgba(0, 0, 0, 0.82);
 }
 .stage__cc-status {
-  font-size: min(2vw, 2vh);
+  font-size: min(2.4vw, 2.4vh);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 .stage__cc-text {
-  font-size: min(3vw, 3.4vh);
+  font-size: min(4vw, 4.6vh);
   line-height: 1.25;
-  max-height: 22vh;
+  max-height: 28vh;
   overflow: hidden;
-  opacity: 0.92;
 }
 
 /* Final minute: red screen, black digits (spec §4.2). */

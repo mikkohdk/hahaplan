@@ -210,18 +210,13 @@ export function HostPage() {
             </button>
           )}
         </div>
-        <div
-          className="row"
-          style={{ justifyContent: "space-between", marginTop: "var(--space-4)" }}
+        <button
+          className={`mg-btn mg-btn--block ${state.transcribe ? "mg-btn--danger" : "mg-btn--secondary"}`}
+          style={{ marginTop: "var(--space-4)" }}
+          onClick={() => act({ type: "setTranscribe", on: !state.transcribe })}
         >
-          <span className="text-caption text-muted">Stage transcription (test)</span>
-          <button
-            className={`mg-btn mg-btn--sm ${state.transcribe ? "mg-btn--accent" : "mg-btn--ghost"}`}
-            onClick={() => act({ type: "setTranscribe", on: !state.transcribe })}
-          >
-            {state.transcribe ? "On" : "Off"}
-          </button>
-        </div>
+          {state.transcribe ? "◉ Stop transcription test" : "▶ Test transcription on stage"}
+        </button>
       </div>
 
       {/* ----------------------------------------------------- lineup ---- */}
