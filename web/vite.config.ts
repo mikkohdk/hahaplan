@@ -19,4 +19,8 @@ export default defineConfig({
     outDir: path.join(root, "dist"),
     emptyOutDir: true,
   },
+  // transformers.js ships its own ESM + wasm; let it load onnxruntime at runtime
+  // rather than having Vite try to pre-bundle it.
+  optimizeDeps: { exclude: ["@huggingface/transformers"] },
+  worker: { format: "es" },
 });

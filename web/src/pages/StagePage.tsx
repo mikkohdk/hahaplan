@@ -1,7 +1,8 @@
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
 import { elapsedMs, formatClock, remainingMs } from "../../../shared/protocol";
 import { useShow, useTick } from "../lib/useShow";
+import { useTranscription } from "../lib/useTranscription";
 
 /**
  * P0 stage display: giant clock the performer never touches.
@@ -15,6 +16,24 @@ export function StagePage() {
   const { showId = "" } = useParams();
   const { state, connected, notFound, serverNow } = useShow(showId);
   useTick(100);
+
+  const {
+    status: ccStatus,
+    text: ccText,
+    error: ccError,
+    start: ccStart,
+    stop: ccStop,
+  } = useTranscription();
+  const [armed, setArmed] = useState(false);
+  const transcribeOn = state?.transcribe ?? false;
+
+  // Host turned transcription off → stop the mic and reset the arm gate.
+  useEffect(() => {
+    if (!transcribeOn && armed) {
+      ccStop();
+      setArmed(false);
+    }
+  }, [transcribeOn, armed, ccStop]);
 
   if (notFound) {
     return (
@@ -75,6 +94,31 @@ export function StagePage() {
         {clock.status === "paused" ? "paused" : label}
         {!connected && " · reconnecting"}
       </div>
+
+      {transcribeOn && (
+        <div className="stage__cc">
+          {!armed ? (
+            <button
+              className="stage__cc-btn"
+              onClick={async () => {
+                setArmed(true);
+                await ccStart();
+              }}
+            >
+              Tap to enable transcription
+            </button>
+          ) : (
+            <>
+              <div className="stage__cc-status">
+                {ccStatus === "loading" && "loading model…"}
+                {ccStatus === "listening" && "● transcribing"}
+                {ccStatus === "error" && `error: ${ccError ?? ""}`}
+              </div>
+              <div className="stage__cc-text">{ccText || "…"}</div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

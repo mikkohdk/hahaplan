@@ -37,6 +37,7 @@ export function createShow(name: string): StoredShow {
       acts: [],
       doneActIds: [],
       clock: { status: "idle", segment: null, startedAtMs: null, accumulatedMs: 0 },
+      transcribe: false,
     },
     hostToken: randomId(26),
   };
@@ -164,6 +165,10 @@ export function applyAction(
     }
     case "setName": {
       state.name = action.name;
+      return;
+    }
+    case "setTranscribe": {
+      state.transcribe = action.on;
       return;
     }
   }
