@@ -82,6 +82,16 @@ export function CheckPage() {
                 ? "No GPU acceleration here. It can still run on the CPU, just slowly. For the stage display, use a device with WebGPU — most modern PCs, Macs and iPads have it."
                 : `This runs best in Chrome, Edge or Safari — ${browser.name} will be noticeably slower.`}
         </div>
+        <div className="check-browsers">
+          <div>
+            <span className="mg-badge mg-badge--success">recommended</span>
+            <span className="text-body-sm">Chrome, Edge, Safari — including iPad</span>
+          </div>
+          <div>
+            <span className="mg-badge mg-badge--danger">not recommended</span>
+            <span className="text-body-sm">Firefox — its WebGPU is much slower for this</span>
+          </div>
+        </div>
       </div>
 
       <div className="mg-card">
