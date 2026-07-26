@@ -184,32 +184,48 @@
   font-size: min(6vw, 8vh);
 }
 
+/* Small fixed ticker along the bottom: status on the left, a live line of
+   captured keywords (newest at the right) filling the rest. Deliberately low
+   and unobtrusive so it never competes with the clock. */
 .stage__cc {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 5;
-  padding: 2.5vh 5vw;
+  padding: 1vh 3vw;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1vh;
+  align-items: baseline;
+  gap: 2vw;
   font-family: var(--font-mono);
-  text-align: center;
   color: #fff; /* always readable, whatever colour the stage is */
-  background: rgba(0, 0, 0, 0.82);
+  background: rgba(0, 0, 0, 0.7);
 }
 .stage__cc-status {
-  font-size: min(2.4vw, 2.4vh);
+  flex-shrink: 0;
+  font-size: min(1.6vw, 1.8vh);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.6;
 }
+.stage__ticker {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end; /* newest tokens pinned to the right, older clip */
+  align-items: baseline;
+  gap: 1.4vw;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: min(2.2vw, 2.6vh);
+}
+.stage__tick-kw { font-weight: 600; }
+.stage__tick-dot { opacity: 0.3; }
 .stage__cc-text {
-  font-size: min(4vw, 4.6vh);
-  line-height: 1.25;
-  max-height: 28vh;
+  flex: 1;
+  min-width: 0;
+  font-size: min(2.2vw, 2.6vh);
+  opacity: 0.7;
   overflow: hidden;
 }
 

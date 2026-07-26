@@ -39,16 +39,31 @@ export function StagePage() {
   }, [transcribeOn, armed, ccStop]);
 
   // Pull location/profession keywords out of the local transcript and send just
-  // those (each once). Audio never leaves; keyword capture is always on.
+  // those (each once). Audio never leaves; keyword capture is always on. Each
+  // new burst of speech also drives the on-stage ticker: the fresh keyword(s),
+  // or a quiet dot when a burst had nothing to capture — so it reads as live
+  // without a wall of transcript.
   const sentKeywordsRef = useRef<Set<string>>(new Set());
+  const [ticker, setTicker] = useState<string[]>([]);
+  const tickLenRef = useRef(0);
   useEffect(() => {
-    if (!transcribeOn || !ccText) return;
+    if (!transcribeOn) return;
+    if (ccText.length < tickLenRef.current) {
+      // Transcript reset (capture restarted) — start the ticker over.
+      tickLenRef.current = 0;
+      sentKeywordsRef.current.clear();
+    }
+    if (ccText.length <= tickLenRef.current) return; // no new speech this render
+    tickLenRef.current = ccText.length;
     const fresh = extractKeywords(ccText).filter(
       (k) => !sentKeywordsRef.current.has(`${k.category}:${k.term}`),
     );
     if (fresh.length) {
       fresh.forEach((k) => sentKeywordsRef.current.add(`${k.category}:${k.term}`));
       sendKeywords(fresh);
+      setTicker((prev) => [...prev, ...fresh.map((k) => k.term)].slice(-24));
+    } else {
+      setTicker((prev) => [...prev, "·"].slice(-24));
     }
   }, [ccText, transcribeOn, sendKeywords]);
 
@@ -132,20 +147,36 @@ export function StagePage() {
             await ccStart();
           }}
         >
-          ▶ Tap to start transcription
+          ▶ Tap once to start · grants mic access
         </button>
       )}
       {transcribeOn && armed && (
         <div className="stage__cc">
           <div className="stage__cc-status">
             {ccStatus === "idle" && "starting…"}
-            {ccStatus === "loading" && "loading model…"}
-            {ccStatus === "listening" && `● transcribing${ccDevice ? ` · ${ccDevice}` : ""}`}
+            {ccStatus === "loading" && "loading…"}
+            {ccStatus === "listening" && `● live${ccDevice ? ` · ${ccDevice}` : ""}`}
             {ccStatus === "error" && "error"}
           </div>
-          <div className="stage__cc-text">
-            {ccStatus === "error" ? `⚠ ${ccError ?? "unknown error"}` : ccText || "…"}
-          </div>
+          {/* A small live ticker of captured keywords (dots for quiet bursts),
+              not the raw transcript — the stage faces the performer. */}
+          {ccStatus === "error" ? (
+            <div className="stage__cc-text">⚠ {ccError ?? "unknown error"}</div>
+          ) : (
+            <div className="stage__ticker">
+              {ticker.length === 0 ? (
+                <span className="stage__tick-dot">listening…</span>
+              ) : (
+                ticker.map((t, i) =>
+                  t === "·" ? (
+                    <span key={i} className="stage__tick-dot">·</span>
+                  ) : (
+                    <span key={i} className="stage__tick-kw">{t}</span>
+                  ),
+                )
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
