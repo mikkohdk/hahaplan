@@ -83,8 +83,10 @@ export function HostPage() {
 
   const stageUrl = `${location.origin}/show/${showId}/stage`;
   const followUrl = `${location.origin}/show/${showId}/follow`;
+  const signupUrl = `${location.origin}/show/${showId}/signup`;
   const stageQr = useQr(stageUrl);
   const followQr = useQr(followUrl);
+  const signupQr = useQr(signupUrl);
 
   if (!token) {
     return (
@@ -306,6 +308,51 @@ export function HostPage() {
           <div style={{ marginTop: "var(--space-3)" }}>
             <Keywords keywords={state.keywords} />
           </div>
+        )}
+      </div>
+
+      {/* -------------------------------------------------- open-mic signup --- */}
+      <div className="mg-card">
+        <div className="row row--wrap" style={{ justifyContent: "space-between", alignItems: "center" }}>
+          <div className="text-title-2">Open-mic sign-up</div>
+          <button
+            className={`mg-btn mg-btn--sm ${state.signup.open ? "mg-btn--danger" : "mg-btn--primary"}`}
+            onClick={() =>
+              act({ type: "setSignup", open: !state.signup.open, defaultSec: state.signup.defaultSec })
+            }
+          >
+            {state.signup.open ? "Close sign-up" : "Open sign-up"}
+          </button>
+        </div>
+        <div
+          className="row row--wrap"
+          style={{ marginTop: "var(--space-3)", alignItems: "center", gap: "var(--space-2)" }}
+        >
+          <span className="text-body-sm text-muted">Each spot</span>
+          <label className="act-field" title="Default slot length in minutes">
+            <MinutesField
+              minutes={Math.round(state.signup.defaultSec / 60)}
+              onCommit={(m) =>
+                act({ type: "setSignup", open: state.signup.open, defaultSec: m * 60 })
+              }
+            />
+            min
+          </label>
+          <span className="text-body-sm text-muted">· performers add their own name</span>
+        </div>
+        {state.signup.open ? (
+          <div className="row row--wrap" style={{ marginTop: "var(--space-4)", justifyContent: "center" }}>
+            <div className="share-qr">
+              <span className="text-overline">sign-up link</span>
+              {signupQr && <img src={signupQr} alt="Sign-up QR" width={180} height={180} />}
+              <span className="link-mono">{signupUrl}</span>
+            </div>
+          </div>
+        ) : (
+          <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-3)" }}>
+            Open sign-up before the show and share the link — performers add themselves and
+            you keep control of the order.
+          </p>
         )}
       </div>
 

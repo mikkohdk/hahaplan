@@ -85,6 +85,12 @@ export function useShow(showId: string) {
     wsRef.current?.send(JSON.stringify(msg));
   }, []);
 
+  const sendSignup = useCallback((name: string) => {
+    setLastError(null);
+    const msg: ClientMessage = { type: "signup", name };
+    wsRef.current?.send(JSON.stringify(msg));
+  }, []);
+
   /** Best estimate of the server's clock right now. */
   const serverNow = useCallback(() => Date.now() + offsetRef.current, []);
 
@@ -96,6 +102,7 @@ export function useShow(showId: string) {
     sendAction,
     sendKeywords,
     sendTranscript,
+    sendSignup,
     serverNow,
   };
 }
