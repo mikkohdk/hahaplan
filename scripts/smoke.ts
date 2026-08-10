@@ -74,6 +74,10 @@ class Client {
     this.ws.send(JSON.stringify({ type: "action", token, action }));
   }
 
+  raw(msg: unknown): void {
+    this.ws.send(JSON.stringify(msg));
+  }
+
   close(): void {
     this.ws.close();
   }
@@ -198,6 +202,34 @@ async function main() {
   const getRes = await fetch(`${BASE}/api/shows/${created.id}`);
   const { state: fetched } = (await getRes.json()) as { state: ShowState };
   assert(fetched.clock.status === "ended", "GET /api/shows/:id reflects final state");
+
+  // -- open-mic sign-up --------------------------------------------------------
+  host.send(hostToken, { type: "setSignup", open: true, defaultSec: 180 });
+  s = await host.nextState();
+  await viewer.nextState();
+  assert(s.signup.open && s.signup.defaultSec === 180, "host opens sign-up");
+  const actsBefore = s.acts.length;
+
+  viewer.raw({ type: "signup", name: "  Walk-in Wanda  " });
+  s = await host.nextState();
+  await viewer.nextState();
+  assert(s.acts.length === actsBefore + 1, "self sign-up appends a performer");
+  const wanda = s.acts[s.acts.length - 1]!;
+  assert(
+    wanda.name === "Walk-in Wanda" && wanda.durationSec === 180 && wanda.kind === "performer",
+    "sign-up trims the name and uses the default slot",
+  );
+
+  host.send(hostToken, { type: "setSignup", open: false, defaultSec: 180 });
+  s = await host.nextState();
+  await viewer.nextState();
+  assert(!s.signup.open, "host closes sign-up");
+
+  viewer.raw({ type: "signup", name: "Too Late Tim" });
+  assert(
+    (await viewer.nextError()).toLowerCase().includes("sign-up"),
+    "sign-up is blocked when closed",
+  );
 
   host.close();
   viewer.close();

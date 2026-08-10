@@ -69,6 +69,18 @@ export const KeywordSchema = z.object({
 });
 export type Keyword = z.infer<typeof KeywordSchema>;
 
+/* ------------------------------------------------------------- signup -- */
+/**
+ * Open-mic self sign-up. When `open`, anyone with the (tokenless) sign-up link
+ * can add themselves to the lineup with just a name; they get a `defaultSec`
+ * slot. The host still owns ordering, timing and removals.
+ */
+export const SignupSchema = z.object({
+  open: z.boolean(),
+  defaultSec: z.number().int().min(30).max(4 * 3600),
+});
+export type Signup = z.infer<typeof SignupSchema>;
+
 export const ShowStateSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -80,6 +92,8 @@ export const ShowStateSchema = z.object({
   transcribe: z.boolean().default(false),
   /** Deduped location/profession keywords mentioned so far (P1 insight). */
   keywords: z.array(KeywordSchema).default([]),
+  /** Open-mic self sign-up settings. */
+  signup: SignupSchema.default({ open: false, defaultSec: 300 }),
 });
 export type ShowState = z.infer<typeof ShowStateSchema>;
 
@@ -101,6 +115,12 @@ export const HostActionSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("setName"), name: z.string().min(1).max(120) }),
   /** Turn stage-client transcription on/off (P1 spike). */
   z.object({ type: z.literal("setTranscribe"), on: z.boolean() }),
+  /** Open/close open-mic sign-up and set the per-slot length. */
+  z.object({
+    type: z.literal("setSignup"),
+    open: z.boolean(),
+    defaultSec: z.number().int().min(30).max(4 * 3600),
+  }),
 ]);
 export type HostAction = z.infer<typeof HostActionSchema>;
 
@@ -115,6 +135,9 @@ export const ClientMessageSchema = z.discriminatedUnion("type", [
   /** Transcript delta from the stage, appended server-side (never broadcast).
    * Stored for optional offline analysis; not shown to viewers. */
   z.object({ type: z.literal("transcript"), text: z.string().max(4000) }),
+  /** Open-mic self sign-up (no token: the sign-up link is public by design;
+   * only allowed while the host has sign-up open). */
+  z.object({ type: z.literal("signup"), name: z.string().min(1).max(80) }),
 ]);
 export type ClientMessage = z.infer<typeof ClientMessageSchema>;
 

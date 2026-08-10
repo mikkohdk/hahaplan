@@ -5,6 +5,7 @@
  */
 import { randomBytes } from "node:crypto";
 import {
+  DEFAULT_WARN_BEFORE_SEC,
   type HostAction,
   type ShowState,
   elapsedMs,
@@ -41,10 +42,33 @@ export function createShow(name: string): StoredShow {
       clock: { status: "idle", segment: null, startedAtMs: null, accumulatedMs: 0 },
       transcribe: false,
       keywords: [],
+      signup: { open: false, defaultSec: 300 },
     },
     hostToken: randomId(26),
     transcript: "",
   };
+}
+
+/** Max acts a show can hold — a guard against sign-up link abuse. */
+const MAX_ACTS = 100;
+
+/**
+ * Append a self-signed-up performer to the lineup. Tokenless (the sign-up link
+ * is public), so it's only allowed while the host has sign-up open, and each
+ * entry gets the host's default slot length.
+ */
+export function addSignup(state: ShowState, rawName: string): void {
+  if (!state.signup.open) throw new ShowError("Sign-up isn't open for this show.");
+  const name = rawName.trim().slice(0, 120);
+  if (!name) throw new ShowError("Please enter a name.");
+  if (state.acts.length >= MAX_ACTS) throw new ShowError("The lineup is full.");
+  state.acts.push({
+    id: randomId(10),
+    kind: "performer",
+    name,
+    durationSec: state.signup.defaultSec,
+    warnBeforeSec: DEFAULT_WARN_BEFORE_SEC,
+  });
 }
 
 /** Mark whatever is on stage as finished (acts go into doneActIds). */
@@ -190,6 +214,10 @@ export function applyAction(
     }
     case "setTranscribe": {
       state.transcribe = action.on;
+      return;
+    }
+    case "setSignup": {
+      state.signup = { open: action.open, defaultSec: action.defaultSec };
       return;
     }
   }

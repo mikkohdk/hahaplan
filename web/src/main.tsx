@@ -7,6 +7,7 @@ import { Landing } from "./pages/Landing";
 import { HostPage } from "./pages/HostPage";
 import { StagePage } from "./pages/StagePage";
 import { FollowPage } from "./pages/FollowPage";
+import { SignupPage } from "./pages/SignupPage";
 import { CheckPage } from "./pages/CheckPage";
 import { LaughLabPage } from "./pages/LaughLabPage";
 
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/show/:showId/host" element={<HostPage />} />
         <Route path="/show/:showId/stage" element={<StagePage />} />
         <Route path="/show/:showId/follow" element={<FollowPage />} />
+        <Route path="/show/:showId/signup" element={<SignupPage />} />
         <Route path="/check" element={<CheckPage />} />
         <Route path="/laughlab" element={<LaughLabPage />} />
       </Routes>

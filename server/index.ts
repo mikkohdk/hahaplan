@@ -20,6 +20,7 @@ import {
 import { ShowRepo } from "./db";
 import {
   ShowError,
+  addSignup,
   applyAction,
   autoEndIfAbandoned,
   createShow,
@@ -179,6 +180,20 @@ app.get("/ws/:showId", { websocket: true }, (socket: WebSocket, req) => {
       return;
     }
 
+    if (msg.type === "signup") {
+      // Tokenless open-mic self sign-up; addSignup enforces "sign-up is open".
+      try {
+        addSignup(show.state, msg.name);
+      } catch (err) {
+        const message = err instanceof ShowError ? err.message : "Internal error.";
+        send(socket, { type: "error", message });
+        return;
+      }
+      repo.save(show);
+      broadcast(showId, show.state);
+      return;
+    }
+
     if (msg.token !== show.hostToken) {
       send(socket, { type: "error", message: "Not authorized: bad host token." });
       return;
@@ -221,6 +236,15 @@ setInterval(() => {
       scheduleTranscriptUpload(show, true);
       console.log(`Auto-ended abandoned show ${show.state.id}`);
     }
+    // Close a sign-up left open on a show that never started, so a forgotten
+    // event doesn't keep the instance warm (and burning hours) indefinitely.
+    const s = show.state;
+    if (s.signup.open && s.clock.status === "idle" && now - s.createdAtMs > 12 * 60 * 60 * 1000) {
+      s.signup = { ...s.signup, open: false };
+      repo.save(show);
+      broadcast(s.id, s);
+      console.log(`Auto-closed stale sign-up for show ${s.id}`);
+    }
   }
 }, 60_000).unref();
 
@@ -231,18 +255,25 @@ setInterval(() => {
 // monthly instance-hours aren't burned between shows.
 const SELF_URL = process.env.RENDER_EXTERNAL_URL;
 if (SELF_URL) {
-  const anyShowRunning = () => {
+  // A show is "active" from the moment sign-up opens, through the whole show,
+  // until it ends — so the instance must stay warm across all of that, not just
+  // while the clock is running. Once every show is ended (and sign-up closed),
+  // idle spin-down resumes so instance-hours aren't burned between events.
+  const anyShowActive = () => {
     for (const show of shows.values()) {
-      if (show.state.clock.status === "running") return true;
+      const s = show.state;
+      if (s.signup.open) return true; // pre-show sign-up window
+      if (s.clock.status === "running" || s.clock.status === "paused") return true;
+      if (s.clock.status !== "ended" && s.acts.length > 0) return true; // lineup ready
     }
     return false;
   };
   setInterval(() => {
-    if (anyShowRunning()) {
+    if (anyShowActive()) {
       fetch(`${SELF_URL}/api/health`).catch(() => {});
     }
   }, 10 * 60 * 1000).unref();
-  console.log("Keep-warm self-ping enabled (active only while a show is running).");
+  console.log("Keep-warm self-ping enabled (active from sign-up open through end of show).");
 }
 
 /* --------------------------------------------- static frontend (prod) --- */
