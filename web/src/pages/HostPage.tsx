@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import QRCode from "qrcode";
 import {
   DEFAULT_WARN_BEFORE_SEC,
   type Act,
@@ -18,15 +17,8 @@ import {
   templateActs,
   type Template,
 } from "../lib/templates";
+import { useQr } from "../lib/useQr";
 import { useShow, useTick } from "../lib/useShow";
-
-function useQr(url: string): string | null {
-  const [src, setSrc] = useState<string | null>(null);
-  useEffect(() => {
-    QRCode.toDataURL(url, { margin: 1, width: 220 }).then(setSrc);
-  }, [url]);
-  return src;
-}
 
 const clampMinutes = (n: number) => Math.min(240, Math.max(1, Math.round(n || 1)));
 

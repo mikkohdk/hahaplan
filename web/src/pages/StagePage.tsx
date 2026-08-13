@@ -1,9 +1,31 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useParams } from "react-router-dom";
-import { elapsedMs, formatClock, remainingMs } from "../../../shared/protocol";
+import { elapsedMs, formatClock, remainingMs, type ShowState } from "../../../shared/protocol";
 import { extractKeywords } from "../lib/gazetteer";
+import { useQr } from "../lib/useQr";
 import { useShow, useTick } from "../lib/useShow";
 import { useTranscription } from "../lib/useTranscription";
+
+/**
+ * Before the show starts, the stage device doubles as the sign-up board: a big
+ * QR the room can scan. It flips to the clock automatically the moment the host
+ * starts the show (clock leaves "idle").
+ */
+function StageSignup({ state, showId }: { state: ShowState; showId: string }) {
+  const url = `${location.origin}/show/${showId}/signup`;
+  const qr = useQr(url, 560);
+  const minutes = Math.round(state.signup.defaultSec / 60);
+  return (
+    <div className="stage stage--signup">
+      <div className="stage-signup__title">{state.name}</div>
+      <div className="stage-signup__cta">Scan to get on the list</div>
+      {qr && <img className="stage-signup__qr" src={qr} alt="Sign-up QR code" />}
+      <div className="stage-signup__meta">
+        {state.acts.length} signed up · {minutes} min each
+      </div>
+    </div>
+  );
+}
 
 /**
  * P0 stage display: giant clock the performer never touches.
@@ -92,6 +114,12 @@ export function StagePage() {
         <div className="stage__label">{connected ? "waiting for show" : "connecting…"}</div>
       </div>
     );
+  }
+
+  // Pre-show: while the host has sign-up open and hasn't started, this device is
+  // the sign-up board. It flips to the clock as soon as the show starts.
+  if (state.clock.status === "idle" && state.signup.open) {
+    return <StageSignup state={state} showId={showId} />;
   }
 
   const { clock } = state;
