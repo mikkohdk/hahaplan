@@ -225,6 +225,30 @@
   opacity: 0.65;
 }
 
+/* Pre-show sign-up board shown on the stage device. */
+.stage--signup { gap: 3vh; padding: 4vh; }
+.stage-signup__title {
+  font-weight: 800;
+  font-size: min(7vw, 8vh);
+  text-align: center;
+  line-height: 1.05;
+}
+.stage-signup__cta { font-size: min(4vw, 4.5vh); opacity: 0.85; }
+.stage-signup__qr {
+  width: min(52vh, 78vw);
+  height: auto;
+  background: #fff;
+  padding: 2.2vh;
+  border-radius: 16px;
+}
+.stage-signup__meta {
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  font-size: min(2.4vw, 2.6vh);
+  opacity: 0.65;
+}
+
 /* Live transcription strip (P1 spike): pinned along the bottom so it never
    covers the giant clock. */
 /* Full-screen gate: browsers only grant the mic on a user gesture, so this
