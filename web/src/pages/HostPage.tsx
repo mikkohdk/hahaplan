@@ -8,6 +8,7 @@ import {
   nextAct,
 } from "../../../shared/protocol";
 import { Keywords } from "../components/Keywords";
+import { ShareLink } from "../components/ShareLink";
 import { claimHostToken } from "../lib/api";
 import { ChevronDown, ChevronUp, X } from "../lib/icons";
 import {
@@ -17,7 +18,6 @@ import {
   templateActs,
   type Template,
 } from "../lib/templates";
-import { useQr } from "../lib/useQr";
 import { useShow, useTick } from "../lib/useShow";
 
 const clampMinutes = (n: number) => Math.min(240, Math.max(1, Math.round(n || 1)));
@@ -76,9 +76,6 @@ export function HostPage() {
   const stageUrl = `${location.origin}/show/${showId}/stage`;
   const followUrl = `${location.origin}/show/${showId}/follow`;
   const signupUrl = `${location.origin}/show/${showId}/signup`;
-  const stageQr = useQr(stageUrl);
-  const followQr = useQr(followUrl);
-  const signupQr = useQr(signupUrl);
 
   if (!token) {
     return (
@@ -332,20 +329,11 @@ export function HostPage() {
           </label>
           <span className="text-body-sm text-muted">· performers add their own name</span>
         </div>
-        {state.signup.open ? (
-          <div className="row row--wrap" style={{ marginTop: "var(--space-4)", justifyContent: "center" }}>
-            <div className="share-qr">
-              <span className="text-overline">sign-up link</span>
-              {signupQr && <img src={signupQr} alt="Sign-up QR" width={180} height={180} />}
-              <span className="link-mono">{signupUrl}</span>
-            </div>
-          </div>
-        ) : (
-          <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-3)" }}>
-            Open sign-up before the show and share the link — performers add themselves and
-            you keep control of the order.
-          </p>
-        )}
+        <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-3)" }}>
+          {state.signup.open
+            ? "Sign-up is open — share the link from the Share section below."
+            : "Open sign-up before the show, then share the link — performers add themselves and you keep control of the order."}
+        </p>
       </div>
 
       {/* ----------------------------------------------------- lineup ---- */}
@@ -495,20 +483,27 @@ export function HostPage() {
       <div className="mg-card">
         <div className="text-title-2">Share</div>
         <p className="text-body-sm text-muted" style={{ marginTop: "var(--space-2)" }}>
-          Stage display goes on the device facing the performer. Follow is for
-          the comedians in the back.
+          Every link in one place. Tap <strong>Share</strong> for WhatsApp / email / Messages,
+          <strong> Copy link</strong> to paste, or the QR to enlarge it for scanning in the room.
         </p>
-        <div className="row row--wrap" style={{ marginTop: "var(--space-4)", justifyContent: "space-around" }}>
-          <div className="share-qr">
-            <span className="text-overline">stage</span>
-            {stageQr && <img src={stageQr} alt="Stage display QR" width={160} height={160} />}
-            <span className="link-mono">{stageUrl}</span>
-          </div>
-          <div className="share-qr">
-            <span className="text-overline">follow</span>
-            {followQr && <img src={followQr} alt="Follow view QR" width={160} height={160} />}
-            <span className="link-mono">{followUrl}</span>
-          </div>
+        <div style={{ marginTop: "var(--space-3)" }}>
+          {state.signup.open && (
+            <ShareLink
+              label="Sign-up"
+              url={signupUrl}
+              description="Performers add their own name — share ahead of the show"
+            />
+          )}
+          <ShareLink
+            label="Stage display"
+            url={stageUrl}
+            description="The screen facing the performer (and the pre-show sign-up board)"
+          />
+          <ShareLink
+            label="Follow view"
+            url={followUrl}
+            description="For the comedians waiting in the back"
+          />
         </div>
       </div>
     </div>
