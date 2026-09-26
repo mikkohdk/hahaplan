@@ -248,23 +248,23 @@ setInterval(() => {
   }
 }, 60_000).unref();
 
-// Keep-warm: while any show is running, ping our own public URL so the host
-// (e.g. Render free tier) doesn't spin the instance down mid-show. The request
-// leaves and returns through the platform edge, counting as inbound activity.
-// It stops itself once no show is live, so idle time still spins down and the
-// monthly instance-hours aren't burned between shows.
+// Keep-warm: ping our own public URL so the free-tier instance doesn't spin
+// down during an event. The request leaves and returns through the platform
+// edge, counting as inbound activity.
+//
+// This MUST stay tightly scoped or it burns the whole monthly instance-hour
+// budget: it only fires while sign-up is open (which the reaper auto-closes
+// after 12h) or the clock is actively running/paused (which the reaper
+// auto-ends 30 min past an abandoned segment). Crucially it does NOT keep warm
+// for a merely idle show that happens to have a lineup — otherwise every
+// leftover show would pin the instance online forever.
 const SELF_URL = process.env.RENDER_EXTERNAL_URL;
 if (SELF_URL) {
-  // A show is "active" from the moment sign-up opens, through the whole show,
-  // until it ends — so the instance must stay warm across all of that, not just
-  // while the clock is running. Once every show is ended (and sign-up closed),
-  // idle spin-down resumes so instance-hours aren't burned between events.
   const anyShowActive = () => {
     for (const show of shows.values()) {
       const s = show.state;
-      if (s.signup.open) return true; // pre-show sign-up window
+      if (s.signup.open) return true; // bounded pre-show sign-up window
       if (s.clock.status === "running" || s.clock.status === "paused") return true;
-      if (s.clock.status !== "ended" && s.acts.length > 0) return true; // lineup ready
     }
     return false;
   };
@@ -273,7 +273,7 @@ if (SELF_URL) {
       fetch(`${SELF_URL}/api/health`).catch(() => {});
     }
   }, 10 * 60 * 1000).unref();
-  console.log("Keep-warm self-ping enabled (active from sign-up open through end of show).");
+  console.log("Keep-warm self-ping enabled (only while sign-up is open or a show is live).");
 }
 
 /* --------------------------------------------- static frontend (prod) --- */
